@@ -352,8 +352,9 @@ reports/spark_parity.json, reports/superset/dashboard.html
 
 ## Status and gates
 
-W0–W9 are complete except the live Superset instance: Docker Hub is unreachable
-from the build machine, so the compose stack is written but unverified.
+W0–W9 are complete. The live Superset instance was verified through the
+Docker-free path (`superset/bootstrap_local.sh`); the compose stack stays as the
+alternative for machines that can reach Docker Hub.
 
 The full plan, including acceptance criteria and the honest refusals, is the PRD:
 [`reports/prd/promo-margin-lab.md`](https://github.com/NikitaBoyarkin/obsidian/blob/main/reports/prd/promo-margin-lab.md).
