@@ -5,10 +5,11 @@ offline grocery trade spend: counterfactual lift, a cannibalization ledger in
 roubles, incremental margin, and a budget-constrained allocation checked against
 a known ground truth.
 
-> **Status: W0–W9.** Data, panel, counterfactual, ledger + P&L, Superset layer,
-> simulated experiment design, response model, allocation, Spark parity and the
-> narrative are in place. The live Superset container is blocked: Docker Hub is
-> unreachable from the daemon here (H5).
+> **Status: W0–W9 complete.** Data, panel, counterfactual, ledger + P&L, Superset,
+> experiment design, response model, allocation, Spark parity and the narrative are
+> in place. The live Superset instance runs locally without Docker (Python 3.11 +
+> pinned requirements); its export bundle is committed at
+> `superset/export/superset-assets.zip`.
 
 ## Result in 60 seconds
 
@@ -161,10 +162,17 @@ Delivered: `superset/docker-compose.yml`, `superset/superset_config.py`,
 render at `reports/superset/dashboard.html` — labelled *static render*, generated
 from the same SQL, with the live stack named in its footer.
 
-**Not delivered, and not faked:** the running instance and the exported asset
-ZIP. `docker compose pull` fails here with `TLS handshake timeout` to
-`registry-1.docker.io` (both `apache/superset:4.1.2` and `postgres:15`), so there
-is no verified live dashboard to export. That is PRD gate H5, not a claim.
+**The live instance is verified.** Docker Hub is unreachable from this machine
+(`TLS handshake timeout` through Docker Desktop's proxy), so Superset runs from a
+Python 3.11 venv instead: `superset/bootstrap_local.sh` installs the pinned
+requirements, upgrades the metadata DB, creates the admin and serves on `:8088`.
+`superset/provision.py` registers the mart database, four datasets, four charts
+and a dashboard, then exports them to `superset/export/superset-assets.zip`.
+
+Proof it is not just config: SQL Lab on the live instance returns
+`COUNT(*)=9053`, `SUM(net_profit)=−17 584 046.0`, `SUM(revenue_delta)=70 502 772.5`
+— the same numbers as `reports/margin.json`. The Docker compose stack stays in
+the repo as the alternative path.
 
 ## W5: a design that survives its own simulation
 
