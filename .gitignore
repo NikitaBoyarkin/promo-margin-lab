@@ -12,3 +12,4 @@ reports/figures/*.png
 .DS_Store
 data/spark/
 .superset-venv/
+.superset/
