@@ -1,0 +1,17 @@
+{
+  "headline": {
+    "categories": 6,
+    "net_profit_rub": -17584046.1,
+    "revenue_delta_rub": 70502772.4,
+    "share_negative": 0.9532,
+    "best_estimator": "forecast",
+    "weeks": 38,
+    "categories_beyond_ceiling": 6
+  },
+  "rows": {
+    "promo_pnl": 6,
+    "model_quality": 3,
+    "guardrails": 38,
+    "breakeven_vs_actual": 6
+  }
+}

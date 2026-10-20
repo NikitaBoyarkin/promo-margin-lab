@@ -1,0 +1,166 @@
+{
+  "model": {
+    "algo": "HistGradientBoostingRegressor",
+    "target": "incremental contribution margin, RUB per promoted cell",
+    "train_cells": 29325,
+    "test_cells": 7691,
+    "holdout_weeks": 16,
+    "features": [
+      "store_id",
+      "sku_id",
+      "category",
+      "format",
+      "promo_depth",
+      "mechanic",
+      "cm_rate",
+      "funded_share",
+      "list_price",
+      "week",
+      "sin1",
+      "cos1",
+      "sin2",
+      "cos2",
+      "holiday",
+      "log_last_clean",
+      "log_smooth",
+      "gap",
+      "has_history"
+    ],
+    "r2": 0.9252,
+    "mae_rub": 89.7,
+    "bias_rub": -25.9
+  },
+  "ranking": {
+    "qini_coefficient": 0.9629,
+    "auuc_rub": 1008487.6,
+    "uplift_at_20pct_rub": 493.0,
+    "test_total_rub": -4068360.5,
+    "test_mean_rub": -529.0,
+    "rho_score_effect": 0.9498
+  },
+  "calibration": {
+    "slope": 1.095,
+    "bias_rub": 25.9,
+    "deciles": [
+      {
+        "bucket": 0,
+        "predicted": -1622.9,
+        "actual": -1760.6,
+        "cells": 770
+      },
+      {
+        "bucket": 1,
+        "predicted": -903.1,
+        "actual": -954.0,
+        "cells": 769
+      },
+      {
+        "bucket": 2,
+        "predicted": -676.1,
+        "actual": -706.5,
+        "cells": 769
+      },
+      {
+        "bucket": 3,
+        "predicted": -530.2,
+        "actual": -549.5,
+        "cells": 769
+      },
+      {
+        "bucket": 4,
+        "predicted": -422.0,
+        "actual": -442.2,
+        "cells": 769
+      },
+      {
+        "bucket": 5,
+        "predicted": -336.7,
+        "actual": -341.0,
+        "cells": 769
+      },
+      {
+        "bucket": 6,
+        "predicted": -261.1,
+        "actual": -268.5,
+        "cells": 769
+      },
+      {
+        "bucket": 7,
+        "predicted": -190.9,
+        "actual": -193.8,
+        "cells": 769
+      },
+      {
+        "bucket": 8,
+        "predicted": -121.8,
+        "actual": -124.7,
+        "cells": 769
+      },
+      {
+        "bucket": 9,
+        "predicted": 35.1,
+        "actual": 52.6,
+        "cells": 769
+      }
+    ]
+  },
+  "policies": {
+    "capacity_cells": 1538,
+    "capacity_share": 0.2,
+    "random": {
+      "total_rub": -812832.7,
+      "ci95": [
+        -850021.2,
+        -779321.1
+      ],
+      "cells": 1538
+    },
+    "qini_rank": {
+      "total_rub": -55396.1,
+      "per_cell_rub": -36.0,
+      "cells": 1538
+    },
+    "threshold": {
+      "total_rub": 54361.4,
+      "per_cell_rub": 190.7,
+      "cells": 285
+    },
+    "oracle_threshold": {
+      "total_rub": 98280.4,
+      "per_cell_rub": 220.4,
+      "cells": 446
+    },
+    "oracle_topk": {
+      "total_rub": -2355.7,
+      "per_cell_rub": -1.5,
+      "cells": 1538
+    },
+    "none": {
+      "total_rub": 0.0,
+      "cells": 0
+    }
+  },
+  "bootstrap": {
+    "qini_ci95": [
+      0.9582,
+      0.9666
+    ],
+    "threshold_ci95": [
+      38270.3,
+      70306.4
+    ],
+    "qini_rank_ci95": [
+      -77155.2,
+      -32916.5
+    ],
+    "threshold_minus_rank_ci95": [
+      97504.9,
+      121568.7
+    ]
+  },
+  "hypothesis": {
+    "threshold_beats_rank": true,
+    "difference_rub": 109757.5,
+    "threshold_beats_none": true
+  }
+}

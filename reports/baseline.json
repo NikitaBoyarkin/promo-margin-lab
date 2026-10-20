@@ -1,0 +1,148 @@
+{
+  "forecast_model": {
+    "model": "ridge_log1p",
+    "alpha": 1.0,
+    "n_features": 192,
+    "train_rows": 417075,
+    "holdout_rows": 107509,
+    "holdout_wape": 0.095,
+    "holdout_weeks": 16
+  },
+  "estimators": {
+    "naive_mean": {
+      "estimator": "naive_mean",
+      "baseline_wape_vs_truth": 0.1211,
+      "baseline_wape_vs_sales": 0.1421,
+      "promo_bias_units": -4.083,
+      "promo_bias_pct": -0.1561,
+      "placebo_cells": 20000,
+      "placebo_within_2pct": 0.1103,
+      "placebo_p05": -0.2547,
+      "placebo_p50": -0.0176,
+      "placebo_p95": 0.2559,
+      "by_category": {
+        "bakery": {
+          "bias_units": -0.381,
+          "bias_pct": -0.0089
+        },
+        "dairy": {
+          "bias_units": -13.215,
+          "bias_pct": -0.3858
+        },
+        "drinks": {
+          "bias_units": -2.805,
+          "bias_pct": -0.1052
+        },
+        "frozen": {
+          "bias_units": -2.938,
+          "bias_pct": -0.1922
+        },
+        "grocery": {
+          "bias_units": -5.283,
+          "bias_pct": -0.2336
+        },
+        "nonfood": {
+          "bias_units": -2.177,
+          "bias_pct": -0.1719
+        }
+      },
+      "baseline_units": 21075243.2
+    },
+    "forecast": {
+      "estimator": "forecast",
+      "baseline_wape_vs_truth": 0.0773,
+      "baseline_wape_vs_sales": 0.094,
+      "promo_bias_units": -0.231,
+      "promo_bias_pct": -0.0088,
+      "placebo_cells": 20000,
+      "placebo_within_2pct": 0.1426,
+      "placebo_p05": -0.1643,
+      "placebo_p50": 0.002,
+      "placebo_p95": 0.218,
+      "by_category": {
+        "bakery": {
+          "bias_units": 0.838,
+          "bias_pct": 0.0196
+        },
+        "dairy": {
+          "bias_units": -1.804,
+          "bias_pct": -0.0527
+        },
+        "drinks": {
+          "bias_units": -0.026,
+          "bias_pct": -0.001
+        },
+        "frozen": {
+          "bias_units": -0.258,
+          "bias_pct": -0.0169
+        },
+        "grocery": {
+          "bias_units": -0.619,
+          "bias_pct": -0.0274
+        },
+        "nonfood": {
+          "bias_units": -0.042,
+          "bias_pct": -0.0033
+        }
+      },
+      "baseline_units": 19965214.7
+    },
+    "matched_control": {
+      "estimator": "matched_control",
+      "baseline_wape_vs_truth": 0.1033,
+      "baseline_wape_vs_sales": 0.1111,
+      "promo_bias_units": -5.135,
+      "promo_bias_pct": -0.1963,
+      "placebo_cells": 20000,
+      "placebo_within_2pct": 0.1221,
+      "placebo_p05": -0.1813,
+      "placebo_p50": 0.0153,
+      "placebo_p95": 0.2736,
+      "by_category": {
+        "bakery": {
+          "bias_units": 3.887,
+          "bias_pct": 0.0908
+        },
+        "dairy": {
+          "bias_units": -22.121,
+          "bias_pct": -0.6458
+        },
+        "drinks": {
+          "bias_units": -1.705,
+          "bias_pct": -0.064
+        },
+        "frozen": {
+          "bias_units": -4.382,
+          "bias_pct": -0.2867
+        },
+        "grocery": {
+          "bias_units": -8.208,
+          "bias_pct": -0.3629
+        },
+        "nonfood": {
+          "bias_units": -3.104,
+          "bias_pct": -0.2451
+        }
+      },
+      "baseline_units": 20309457.5
+    }
+  },
+  "headline": {
+    "best_by_abs_bias": "forecast",
+    "bias_pct": {
+      "naive_mean": -0.1561,
+      "forecast": -0.0088,
+      "matched_control": -0.1963
+    },
+    "wape": {
+      "naive_mean": 0.1211,
+      "forecast": 0.0773,
+      "matched_control": 0.1033
+    },
+    "bias_gap_pp": -0.1473,
+    "bias_reduction_x": 17.74,
+    "wape_reduction_x": 1.57,
+    "promo_cells": 37016,
+    "true_lift_units": 968245.7
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "spark_version": "4.2.0",
+  "java": "/opt/homebrew/opt/openjdk@25",
+  "parity": {
+    "stores": 10,
+    "rows_compared": 780,
+    "max_abs_diff": {
+      "units_sum": 0.0,
+      "revenue_sum": 0.0,
+      "promo_cells": 0.0,
+      "max_depth": 0.0,
+      "mean_lag": 0.0,
+      "mean_roll4": 0.0
+    },
+    "max_abs_diff_overall": 0.0,
+    "rows_with_missing_side": 0,
+    "ok": true
+  },
+  "plan": {
+    "broadcast_join": true,
+    "window": true,
+    "shuffle": true
+  },
+  "scale": {
+    "rows": 16600000,
+    "output_rows": 166000,
+    "seconds": 14.1,
+    "partitions": 4,
+    "written_to": "data/spark/scale",
+    "broadcast_join_in_plan": true,
+    "window_in_plan": true,
+    "shuffle_in_plan": true
+  },
+  "honest_scope": "local[*], single JVM; runtime is not a cluster throughput claim"
+}

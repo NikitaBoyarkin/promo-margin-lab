@@ -1,0 +1,24 @@
+{
+  "design": {
+    "unit": "store",
+    "arms": 2,
+    "stores": 120,
+    "stores_per_arm": 60,
+    "weeks": 8,
+    "primary_metric": "incremental contribution margin, RUB per store-week",
+    "alpha": 0.05,
+    "target_power": 0.8
+  },
+  "variance": {
+    "icc": 0.138,
+    "between_store_sd": 884.0,
+    "residual_sd": 2125.72,
+    "stores": 120,
+    "weeks": 78
+  },
+  "mde": {
+    "rub_per_store_week": 611.7,
+    "sigma_store": 1195.8,
+    "analytic_power": 0.8
+  }
+}

@@ -1,0 +1,81 @@
+# Superset demo — promo-margin-lab
+
+A local, reproducible Apache Superset instance over `data/marts/promo.db`
+(SQLite, built by `run.py --stage marts`). No warehouse, no credentials.
+
+## Status (honest)
+
+| Item | State |
+|---|---|
+| Mart SQL, SQLite database, dataset contract | **built and tested** (`tests/test_marts.py`) |
+| Compose stack | written, **image pull timed out in the build environment** on 2026-10-20 |
+| Live dashboard, exported asset ZIP | **not produced yet** — needs a working `docker pull` |
+| Static render | **built**: `reports/superset/dashboard.html`, regenerated from the same SQL |
+
+So do not read the PNG/HTML as "the interactive instance". It is a render, and it
+says so in its footer.
+
+## Run it
+
+```bash
+cd promo-margin-lab
+uv run python run.py --stage marts        # builds data/marts/promo.db + render
+cd superset
+docker compose up -d
+docker compose logs -f superset           # wait for "Booting worker"
+open http://localhost:8088                # admin / admin (local demo only)
+```
+
+`SUPERSET_SECRET_KEY` is read from the environment; the default is a local-only
+placeholder. Nothing here is production-hardened: no Redis, no Celery, no SSO.
+
+## Connect the mart database
+
+```bash
+docker compose exec superset \
+  superset set-database-uri -a promo-marts -u sqlite:////app/marts/promo.db
+```
+
+Or through the UI: *Settings → Database Connections → + Database → Other*,
+SQLAlchemy URI `sqlite:////app/marts/promo.db`, **Test connection**, **Connect**.
+The file is mounted read-only at `/app/marts`.
+
+## Datasets
+
+Each mart is one saved SQL query, registered as a dataset. Paste the file
+contents into **SQL Lab**, run, then **Save → Save dataset**:
+
+| Dataset | SQL file | Grain |
+|---|---|---|
+| `promo_pnl` | `sql/marts/01_promo_pnl.sql` | category |
+| `model_quality` | `sql/marts/02_model_quality.sql` | estimator |
+| `guardrails` | `sql/marts/03_guardrails.sql` | week |
+| `breakeven_vs_actual` | `sql/marts/04_breakeven_vs_actual.sql` | category |
+
+Why datasets and not raw tables: the dashboard must not be able to drift from
+the SQL. A number on a chart has exactly one definition, in `sql/marts/`, and
+`tests/test_marts.py` pins it to `reports/ledger.json`.
+
+## Charts and dashboards
+
+Spec: [`dashboards.md`](dashboards.md). Three dashboards — *Promo P&L*, *Model
+Quality*, *Guardrails* — plus one row-level-security demo (filter by `format`)
+that is described but not yet applied.
+
+## Export
+
+Once the instance is up:
+
+```bash
+TOKEN=$(curl -s -X POST http://localhost:8088/api/v1/security/login \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"admin","password":"admin","provider":"db","refresh":false}' \
+  | python3 -c 'import sys,json;print(json.load(sys.stdin)["access_token"])')
+
+curl -s -H "Authorization: Bearer $TOKEN" \
+  http://localhost:8088/api/v1/assets/export/ -o export/superset-assets.zip
+```
+
+The ZIP is a YAML bundle of databases, datasets, charts and dashboards — a
+config artefact, not a rendered dashboard. Commit it only after a successful
+import into a clean instance; otherwise it is just an untested claim.

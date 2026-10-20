@@ -1,0 +1,31 @@
+{
+  "config": {
+    "seed": 42,
+    "stores": 120,
+    "skus": 60,
+    "weeks": 78,
+    "fast": false
+  },
+  "rows": 561600,
+  "promo_cells": 37016,
+  "promo_share": 0.0659,
+  "depth_mean": 0.2543,
+  "depth_max": 0.4,
+  "units_sold": 21087544.9,
+  "units_returned": 99057.0,
+  "return_share": 0.0047,
+  "revenue_rub": 2002363913.5,
+  "cm_rub": 500664469.2,
+  "discount_cost_rub": 59976926.9,
+  "panel_hash": "ae38964b1eb003e9",
+  "features": [
+    "promo_flag",
+    "promo_depth",
+    "mechanic",
+    "funded_share",
+    "list_price",
+    "supplier_funding",
+    "cm_rate"
+  ],
+  "n_features": 7
+}

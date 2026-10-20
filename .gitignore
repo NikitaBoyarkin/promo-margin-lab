@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+data/raw/
+data/marts/
+reports/*_fast.json
+data/panel/*_fast.parquet
+data/truth/*_fast.parquet
+reports/figures/*.png
+.DS_Store
+data/spark/
