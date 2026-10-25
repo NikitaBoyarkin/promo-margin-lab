@@ -1,0 +1,255 @@
+{
+  "status": "pre-launch audit — no experiment has run, no assignment artifact exists",
+  "design": {
+    "unit": "store",
+    "stores": 120,
+    "stores_per_arm": 60,
+    "weeks": 8,
+    "primary_metric": "incremental contribution margin, RUB per store-week, net units",
+    "alpha": 0.05,
+    "target_power": 0.8,
+    "formats": {
+      "convenience": 62,
+      "supermarket": 46,
+      "hyper": 12
+    }
+  },
+  "variance": {
+    "full_panel": {
+      "icc": 0.2791,
+      "between_store_sd": 1354.1,
+      "residual_sd": 2140.86,
+      "stores": 120,
+      "weeks": 78
+    },
+    "experiment_window": {
+      "icc": 0.4222,
+      "between_store_sd": 1704.18,
+      "residual_sd": 1842.25,
+      "stores": 120,
+      "weeks": 8
+    },
+    "gross_base_window": {
+      "icc": 0.3572,
+      "between_store_sd": 1536.96,
+      "residual_sd": 1862.98,
+      "stores": 120,
+      "weeks": 8
+    },
+    "sigma_store_window_net": 1704.18,
+    "sigma_store_window_gross": 1536.96
+  },
+  "mde": {
+    "sigma": 1704.18,
+    "n_arm": 60,
+    "mde_z": 871.7,
+    "mde_t": 879.0,
+    "z_alpha_plus_beta": 2.8016,
+    "as_pct_of_weekly_revenue": 0.407,
+    "revenue_per_store_week": 213927.8,
+    "exposed_weeks_in_window": 4,
+    "mde_per_exposed_store_week": 1743.4,
+    "analytic_power_at_mde": 0.8,
+    "mde_gross_base": 786.1
+  },
+  "monte_carlo": {
+    "reps": 1000,
+    "false_positive_rate": 0.043,
+    "power_at_mde": 0.78,
+    "binomial_se_pp": 1.26
+  },
+  "metric_base_error": {
+    "incremental_cm_gross_window_rub": -2613265.6,
+    "incremental_cm_net_window_rub": -3023099.2,
+    "overstatement_rub": 409833.7,
+    "overstatement_share_of_gross_pct": 15.68,
+    "note": "gross base is what src/experiment.py:43 uses; net is the pre-registered metric"
+  },
+  "srm": {
+    "planned_split": {
+      "control": 60,
+      "treatment": 60
+    },
+    "aggregate_designed": {
+      "observed": {
+        "control": 60,
+        "treatment": 60
+      },
+      "expected": {
+        "control": 60.0,
+        "treatment": 60.0
+      },
+      "chi2": 0.0,
+      "p_value": 1.0,
+      "srm": false
+    },
+    "aggregate_flat_permutation_p_srm": "see per_stratum below",
+    "per_stratum_designed": {
+      "convenience": {
+        "observed": {
+          "control": 31,
+          "treatment": 31
+        },
+        "expected": {
+          "control": 31.0,
+          "treatment": 31.0
+        },
+        "chi2": 0.0,
+        "p_value": 1.0,
+        "srm": false
+      },
+      "supermarket": {
+        "observed": {
+          "control": 23,
+          "treatment": 23
+        },
+        "expected": {
+          "control": 23.0,
+          "treatment": 23.0
+        },
+        "chi2": 0.0,
+        "p_value": 1.0,
+        "srm": false
+      },
+      "hyper": {
+        "observed": {
+          "control": 6,
+          "treatment": 6
+        },
+        "expected": {
+          "control": 6.0,
+          "treatment": 6.0
+        },
+        "chi2": 0.0,
+        "p_value": 1.0,
+        "srm": false
+      }
+    },
+    "per_stratum_under_implemented_flat_permutation": {
+      "convenience": {
+        "planned": "31/31",
+        "flat_permutation_most_common": [
+          [
+            31,
+            1416
+          ],
+          [
+            30,
+            1385
+          ],
+          [
+            32,
+            1318
+          ]
+        ],
+        "p_any_imbalance_gt_0": 0.858,
+        "p_srm_at_0.001": 0.0
+      },
+      "supermarket": {
+        "planned": "23/23",
+        "flat_permutation_most_common": [
+          [
+            23,
+            1485
+          ],
+          [
+            24,
+            1435
+          ],
+          [
+            22,
+            1361
+          ]
+        ],
+        "p_any_imbalance_gt_0": 0.852,
+        "p_srm_at_0.001": 0.0
+      },
+      "hyper": {
+        "planned": "6/6",
+        "flat_permutation_most_common": [
+          [
+            6,
+            2378
+          ],
+          [
+            7,
+            2049
+          ],
+          [
+            5,
+            1965
+          ]
+        ],
+        "p_any_imbalance_gt_0": 0.762,
+        "p_srm_at_0.001": 0.0004
+      }
+    },
+    "p_all_strata_exact": 0.0352,
+    "reps": 10000
+  },
+  "assignment": {
+    "flat_permutation": {
+      "sd_of_estimated_diff": 312.1,
+      "p95_abs_diff": 588.3,
+      "false_positive_rate": 0.041,
+      "power_at_mde": 0.786
+    },
+    "stratified_by_format": {
+      "sd_of_estimated_diff": 195.2,
+      "p95_abs_diff": 388.8,
+      "false_positive_rate": 0.001,
+      "power_at_mde": 0.88
+    },
+    "variance_reduction_pct": 60.88,
+    "reps": 1000
+  },
+  "guardrail": {
+    "metric": "weekly revenue per store",
+    "rule_point_2pct_two_weeks": {
+      "false_stop_rate": 0.43,
+      "target": 0.05,
+      "verdict": "not a test"
+    },
+    "rule_z_bonferroni_0.001_two_sided": {
+      "false_stop_rate": 0.0,
+      "alpha_per_read": 6.3e-05,
+      "reads": 16,
+      "verdict": "calibrated"
+    },
+    "mde_level_rub": 64206.7,
+    "mde_level_pct_of_revenue": 26.1536,
+    "mde_relative_pct": 0.8181,
+    "mde_relative_note": "per-store window/pre-period revenue ratio; the scale a 2% rule lives on",
+    "reps": 1000
+  },
+  "attrition": {
+    "stores_dropped": 10,
+    "ttest_statistic": NaN,
+    "p_value": NaN,
+    "p_is_nan": true,
+    "rejected_at_0.05": false,
+    "note": "NaN p-value is counted as 'not rejected', i.e. as evidence of no effect"
+  },
+  "effect_vs_mde": {
+    "mde_rub_per_store_week": 871.7,
+    "policy_gain_per_week_rub": 1119358.2,
+    "if_gain_repeats_weekly_rub_per_store_week": 9328.0,
+    "if_gain_lands_once_per_window_rub_per_store_week": 1166.0,
+    "ratio_weekly": 10.7,
+    "ratio_diluted": 1.34,
+    "evidence_class": "Inferred — W7 one-week planning instance rescaled to 120 stores"
+  },
+  "n_per_arm_required_for_2pct_revenue_effect": 3,
+  "mde_by_n_arm": {
+    "30": 1232.7,
+    "60": 871.7,
+    "120": 616.4,
+    "240": 435.8,
+    "480": 308.2
+  },
+  "store_mean_spread": {
+    "p10": -4882.8,
+    "p50": -2677.7,
+    "p90": -1586.5
+  }
+}
