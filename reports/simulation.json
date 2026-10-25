@@ -3,20 +3,20 @@
     "null": {
       "reps": 1000,
       "effect_rub": 0.0,
-      "reject_rate": 0.047,
-      "mean_estimate": -8.77,
-      "bias": -8.77,
-      "ci_coverage": 0.95,
+      "reject_rate": 0.043,
+      "mean_estimate": -11.77,
+      "bias": -11.77,
+      "ci_coverage": 0.953,
       "n_arm": 60,
       "window_weeks": 8
     },
     "at_mde": {
       "reps": 1000,
-      "effect_rub": 611.66,
+      "effect_rub": 786.15,
       "reject_rate": 0.778,
-      "mean_estimate": 602.9,
-      "bias": -8.77,
-      "ci_coverage": 0.95,
+      "mean_estimate": 774.38,
+      "bias": -11.77,
+      "ci_coverage": 0.953,
       "n_arm": 60,
       "window_weeks": 8
     }
@@ -30,29 +30,29 @@
     "null": {
       "reps": 500,
       "effect_rub": 0.0,
-      "reject_rate": 0.04,
+      "reject_rate": 0.052,
       "block_weeks": 2,
       "window_weeks": 76,
       "n_stores": 120
     },
     "at_mde": {
       "reps": 500,
-      "effect_rub": 611.66,
-      "reject_rate": 0.878,
+      "effect_rub": 786.15,
+      "reject_rate": 0.986,
       "block_weeks": 2,
       "window_weeks": 76,
       "n_stores": 120
     },
     "carryover_test": {
       "reps": 500,
-      "effect_rub": 611.66,
+      "effect_rub": 786.15,
       "reject_rate": 1.0,
       "block_weeks": 2,
       "window_weeks": 76,
       "n_stores": 120,
-      "week1_effect": 616.3,
-      "week2_effect": 303.1,
-      "carryover_ratio": 0.492
+      "week1_effect": 791.1,
+      "week2_effect": 391.3,
+      "carryover_ratio": 0.495
     }
   }
 }

@@ -75,7 +75,8 @@ def _rolling_prior_mean(cube: np.ndarray, valid: np.ndarray, window: int) -> np.
     for lag in range(1, window + 1):
         shifted = np.full_like(cube, np.nan)
         shifted[:, :, lag:] = cube[:, :, :-lag]
-        ok = valid[:, :, lag:] & ~np.isnan(shifted[:, :, lag:])
+        # validity is a property of the *source* week (t - lag), not the target week
+        ok = valid[:, :, :-lag] & ~np.isnan(shifted[:, :, lag:])
         clean = np.nan_to_num(shifted)
         total[:, :, lag:] += clean[:, :, lag:]
         count[:, :, lag:] += ok
@@ -218,11 +219,19 @@ def _design(
 def forecast_counterfactual(
     panel: pd.DataFrame, grid: Grid, holdout_weeks: int = 16
 ) -> tuple[np.ndarray, dict]:
-    """Log-linear ridge trained only on non-promo cells; predicts the promo-free level."""
+    """Log-linear ridge trained only on promo-free cells; predicts the promo-free level."""
     hist = history_features(panel, grid)
-    frame = pd.concat(
-        [panel.loc[~panel["promo_flag"]].copy(), hist.loc[~panel["promo_flag"]]], axis=1
+    # Post-promo weeks are contaminated by the pantry drag: training on them
+    # teaches the model to predict the dip, which then hides it from the ledger.
+    promo = panel["promo_flag"].astype(bool)
+    ordered = panel.sort_values(["store_id", "sku_id", "week"])
+    dirty = ordered.groupby(["store_id", "sku_id"])["promo_flag"].transform(
+        lambda s: s.astype(bool).shift(1, fill_value=False)
+        | s.astype(bool).shift(2, fill_value=False)
+        | s.astype(bool).shift(3, fill_value=False)
     )
+    clean = ~promo & ~dirty.reindex(panel.index).fillna(False)
+    frame = pd.concat([panel.loc[clean].copy(), hist.loc[clean]], axis=1)
     frame["y"] = np.log1p(frame["units_sold"])
     last_week = int(panel["week"].max())
     train = frame[frame["week"] <= last_week - holdout_weeks]

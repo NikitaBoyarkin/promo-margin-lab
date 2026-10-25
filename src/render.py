@@ -36,7 +36,7 @@ def _table(frame: pd.DataFrame, columns: dict[str, str], highlight: str | None =
                 cls = ' class="neg"' if value < 0 else ' class="pos"'
             cells.append(f"<td{cls}>{html.escape(text)}</td>")
         rows.append("<tr>" + "".join(cells) + "</tr>")
-    return f"<table><thead><tr>{head}</tr></thead><tbody>{''.join(rows)}</tbody></table>"
+    return f'<div class="table-wrap"><table><thead><tr>{head}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
 
 
 def _bars(frame: pd.DataFrame, value: str) -> str:
@@ -107,6 +107,7 @@ def render(
  .label {{ color:#a1a1aa; font-size:12px; }}
  .value {{ font-size:22px; font-weight:650; margin-top:6px; font-variant-numeric:tabular-nums; }}
  .pos {{ color:#4ade80; }} .neg {{ color:#f87171; }}
+ .table-wrap {{ overflow-x:auto; -webkit-overflow-scrolling:touch; max-width:100%; }}
  table {{ width:100%; border-collapse:collapse; background:#131317;
           border:1px solid #27272a; border-radius:10px; overflow:hidden; }}
  th, td {{ padding:9px 12px; text-align:right; border-bottom:1px solid #1f1f23;
@@ -120,7 +121,13 @@ def render(
         border-radius:10px; padding:12px; box-sizing:border-box; }}
  footer {{ margin-top:40px; color:#71717a; font-size:12px; }}
  code {{ color:#d4d4d8; }}
- @media (max-width: 760px) {{ .cards {{ grid-template-columns:repeat(2,1fr); }} }}
+ /* Below 760px the tables' min-content width exceeds the viewport, so the
+    page itself must never be the scroll container — .table-wrap does that. */
+ @media (max-width: 760px) {{
+   .cards {{ grid-template-columns:repeat(2,1fr); }}
+   main {{ padding: 32px 16px 48px; }}
+   table {{ min-width: 640px; }}
+ }}
 </style></head><body><main>
 <h1>Promo Margin Lab</h1>
 <p class="sub">Промо-экономика офлайн-ритейла: лифт, каннибализация, маржа, потолок глубины.</p>

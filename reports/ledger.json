@@ -6,98 +6,105 @@
   "summary": {
     "waves": 9053,
     "promoted_cells": 37016,
-    "own_lift_units": 959699.3,
-    "net_lift_units": 996422.5,
-    "pantry_units": 28343.8,
-    "cannibalization_units": -206780.2,
-    "halo_units": 215159.5,
-    "network_shift_units": -213815.5,
-    "revenue_delta_rub": 70502772.5,
-    "net_profit_rub": -17584046.0,
+    "own_lift_units": 932049.8,
+    "net_lift_units": 740541.3,
+    "pantry_units": -199865.4,
+    "cannibalization_units": -176886.7,
+    "halo_units": 185243.5,
+    "network_shift_units": -183607.8,
+    "revenue_delta_rub": 68495020.1,
+    "net_profit_rub": -24397020.0,
     "discount_cost_rub": 59976926.9,
     "supplier_funding_rub": 15584495.7,
-    "share_waves_negative_profit": 0.9532,
-    "share_revenue_up_profit_down": 0.9531,
-    "median_net_profit_rub": -1542.4,
-    "leak_share": -0.0383,
+    "share_waves_negative_profit": 0.9788,
+    "share_revenue_up_profit_down": 0.9787,
+    "median_net_profit_rub": -2050.6,
+    "leak_share": 0.2055,
     "response_curves": {
       "dairy": {
-        "k": 7.25,
-        "amplitude": 1.1412,
-        "r2": 0.9373,
+        "k": 7.0,
+        "amplitude": 1.1169,
+        "r2": 0.9391,
         "n": 5349,
         "bins": 20
       },
       "bakery": {
-        "k": 3.25,
-        "amplitude": 1.1569,
-        "r2": 0.9667,
+        "k": 3.0,
+        "amplitude": 1.1464,
+        "r2": 0.9639,
         "n": 7592,
         "bins": 20
       },
       "grocery": {
-        "k": 5.0,
-        "amplitude": 1.3633,
+        "k": 4.75,
+        "amplitude": 1.341,
         "r2": 0.9652,
         "n": 5587,
         "bins": 20
       },
       "drinks": {
-        "k": 4.0,
-        "amplitude": 0.9225,
-        "r2": 0.9346,
+        "k": 3.75,
+        "amplitude": 0.9054,
+        "r2": 0.9385,
         "n": 6149,
         "bins": 20
       },
       "frozen": {
-        "k": 4.5,
-        "amplitude": 1.0834,
-        "r2": 0.9662,
+        "k": 4.25,
+        "amplitude": 1.0649,
+        "r2": 0.9677,
         "n": 5178,
         "bins": 20
       },
       "nonfood": {
         "k": 4.5,
-        "amplitude": 1.2665,
-        "r2": 0.9644,
+        "amplitude": 1.2008,
+        "r2": 0.9625,
         "n": 7157,
         "bins": 19
       }
     },
+    "pnl_bridge": {
+      "margin_on_incremental_units_rub": 25270023.1,
+      "discount_net_of_supplier_funding_rub": -44392430.4,
+      "promo_cells_profit_rub": -19122407.3,
+      "spillover_profit_rub": -5274624.9,
+      "net_profit_rub": -24397032.1
+    },
     "reconciliation": {
       "own_units": {
-        "estimated": 959699.3,
+        "estimated": 932049.8,
         "oracle": 968245.7,
-        "error_pct": -0.0088
+        "error_pct": -0.0374
       },
       "pantry_units": {
-        "estimated": 28343.8,
-        "oracle": 5303.9,
-        "error_pct": 4.3439
+        "estimated": -199865.4,
+        "oracle": -228331.3,
+        "error_pct": 0.1247
       },
       "cannibalization_units": {
-        "estimated": -206780.2,
+        "estimated": -176886.7,
         "oracle": -195048.7,
-        "error_pct": -0.0601
+        "error_pct": 0.0931
       },
       "halo_units": {
-        "estimated": 215159.5,
+        "estimated": 185243.5,
         "oracle": 203603.4,
-        "error_pct": 0.0568
+        "error_pct": -0.0902
       },
       "net_units": {
-        "estimated": 996422.5,
-        "oracle": 982104.3,
-        "error_pct": 0.0146
+        "estimated": 740541.3,
+        "oracle": 748469.1,
+        "error_pct": -0.0106
       },
       "net_profit_rub": {
-        "estimated": -17584046.0,
-        "oracle": -18027789.3,
-        "error_pct": 0.0246
+        "estimated": -24397020.0,
+        "oracle": -24441931.0,
+        "error_pct": 0.0018
       },
       "share_waves_negative_profit": {
-        "estimated": 0.9532,
-        "oracle": 0.9618
+        "estimated": 0.9788,
+        "oracle": 0.9874
       }
     }
   },
@@ -106,41 +113,41 @@
       "store_id": "S109",
       "week": 22,
       "category": "frozen",
-      "own_units": 207.51478718374275,
-      "net_units": 268.7699355638699,
-      "net_profit": 9384.235567827764
-    },
-    {
-      "store_id": "S002",
-      "week": 10,
-      "category": "frozen",
-      "own_units": 169.79541587265365,
-      "net_units": 251.7812527947869,
-      "net_profit": 4705.863164488826
+      "own_units": 206.36928759583506,
+      "net_units": 147.36259807469267,
+      "net_profit": 6213.854240859961
     },
     {
       "store_id": "S095",
       "week": 58,
       "category": "frozen",
-      "own_units": 132.8907308197227,
-      "net_units": 212.54269590039058,
-      "net_profit": 4523.3669883143275
+      "own_units": 132.36181878876837,
+      "net_units": 184.57278599184104,
+      "net_profit": 3806.9681333306407
+    },
+    {
+      "store_id": "S006",
+      "week": 50,
+      "category": "bakery",
+      "own_units": 433.0537276243748,
+      "net_units": 826.04669928803,
+      "net_profit": 3603.6720351860895
+    },
+    {
+      "store_id": "S002",
+      "week": 10,
+      "category": "frozen",
+      "own_units": 169.164422543229,
+      "net_units": 177.61968984812853,
+      "net_profit": 2916.2539524797703
     },
     {
       "store_id": "S020",
-      "week": 11,
-      "category": "frozen",
-      "own_units": 103.29324148824799,
-      "net_units": 149.67006257651744,
-      "net_profit": 3523.0866474204367
-    },
-    {
-      "store_id": "S109",
-      "week": 26,
+      "week": 3,
       "category": "bakery",
-      "own_units": 1532.1373985601508,
-      "net_units": 2902.6805999165144,
-      "net_profit": 3477.576527679297
+      "own_units": 561.5837982045076,
+      "net_units": 855.6454958051429,
+      "net_profit": 2159.430579635701
     }
   ],
   "worst_waves_by_profit": [
@@ -148,41 +155,41 @@
       "store_id": "S109",
       "week": 19,
       "category": "grocery",
-      "own_units": 976.3208752476684,
-      "net_units": 1089.5026786899266,
-      "net_profit": -20501.195792258222
-    },
-    {
-      "store_id": "S072",
-      "week": 70,
-      "category": "nonfood",
-      "own_units": 206.15519190405058,
-      "net_units": 211.96427847913316,
-      "net_profit": -20366.24981002039
-    },
-    {
-      "store_id": "S109",
-      "week": 22,
-      "category": "nonfood",
-      "own_units": 150.6201186569046,
-      "net_units": 89.36497027677746,
-      "net_profit": -17117.11720103403
-    },
-    {
-      "store_id": "S103",
-      "week": 70,
-      "category": "nonfood",
-      "own_units": 158.75784842075205,
-      "net_units": 122.62428331791668,
-      "net_profit": -16881.147770571733
+      "own_units": 963.2076902234453,
+      "net_units": 700.2452539185387,
+      "net_profit": -31472.958005756293
     },
     {
       "store_id": "S103",
       "week": 59,
       "category": "nonfood",
-      "own_units": 162.18033865546676,
-      "net_units": 161.28502220910326,
-      "net_profit": -15189.384009644647
+      "own_units": 154.20747525377973,
+      "net_units": 63.71181582923677,
+      "net_profit": -28120.92805336738
+    },
+    {
+      "store_id": "S115",
+      "week": 71,
+      "category": "nonfood",
+      "own_units": 122.62686151971468,
+      "net_units": 38.763086716519545,
+      "net_profit": -27215.968371798725
+    },
+    {
+      "store_id": "S115",
+      "week": 22,
+      "category": "nonfood",
+      "own_units": 177.02754545404196,
+      "net_units": 136.37103816008468,
+      "net_profit": -23560.583834403715
+    },
+    {
+      "store_id": "S022",
+      "week": 71,
+      "category": "nonfood",
+      "own_units": 217.51916868850742,
+      "net_units": 167.6846391098926,
+      "net_profit": -23531.177046357363
     }
   ]
 }

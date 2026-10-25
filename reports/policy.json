@@ -2,94 +2,124 @@
   "planning_week": 77,
   "candidates": 4756,
   "depth_cap_by_category": {
-    "dairy": 0.025,
-    "bakery": 0.1,
-    "grocery": 0.1,
-    "drinks": 0.045,
-    "frozen": 0.02,
-    "nonfood": 0.205
+    "dairy": 0.02,
+    "bakery": 0.085,
+    "grocery": 0.09,
+    "drinks": 0.03,
+    "frozen": 0.01,
+    "nonfood": 0.195
   },
   "blanket_15": {
-    "spend_rub": 4506591.8,
-    "profit_rub": -772223.9,
+    "spend_rub": 4448116.5,
+    "profit_rub": -851508.3,
     "cells": 4756,
-    "profit_per_ruble": -0.1714
+    "profit_per_ruble": -0.1914
   },
   "scenarios": {
     "tight": {
-      "budget_rub": 450659.2,
+      "budget_rub": 444811.6,
       "random_15": {
-        "spend_rub": 450652.0,
-        "profit_rub": 21460.5,
-        "cells": 1097,
-        "unspent_rub": 7.2
+        "spend_rub": 444806.7,
+        "profit_rub": 21888.4,
+        "cells": 1240,
+        "unspent_rub": 4.9
       },
       "top_ratio_15": {
-        "spend_rub": 450646.0,
-        "profit_rub": 147471.7,
-        "cells": 778,
-        "unspent_rub": 13.2
+        "spend_rub": 444806.2,
+        "profit_rub": 136648.0,
+        "cells": 966,
+        "unspent_rub": 5.5
       },
       "optimised": {
-        "spend_rub": 450619.9,
-        "profit_rub": 222301.2,
-        "cells": 1676,
-        "unspent_rub": 39.2,
+        "spend_rub": 444806.1,
+        "profit_rub": 231496.4,
+        "cells": 7798,
+        "unspent_rub": 5.6,
         "depths": {
-          "0.05": 1676
+          "0.01": 2393,
+          "0.02": 1784,
+          "0.03": 1350,
+          "0.04": 884,
+          "0.05": 568,
+          "0.06": 364,
+          "0.07": 207,
+          "0.08": 123,
+          "0.09": 69,
+          "0.1": 32,
+          "0.11": 15,
+          "0.12": 7,
+          "0.13": 1,
+          "0.14": 1
         }
       }
     },
     "loose": {
-      "budget_rub": 2253295.9,
+      "budget_rub": 2224058.2,
       "random_15": {
-        "spend_rub": 2038474.4,
-        "profit_rub": 118322.1,
+        "spend_rub": 1763271.0,
+        "profit_rub": 96536.8,
         "cells": 4756,
-        "unspent_rub": 214821.5
+        "unspent_rub": 460787.2
       },
       "top_ratio_15": {
-        "spend_rub": 1271922.9,
-        "profit_rub": 225835.7,
-        "cells": 2594,
-        "unspent_rub": 981373.0
+        "spend_rub": 1073507.2,
+        "profit_rub": 191501.8,
+        "cells": 2548,
+        "unspent_rub": 1150551.0
       },
       "optimised": {
-        "spend_rub": 486954.5,
-        "profit_rub": 223645.1,
-        "cells": 1829,
-        "unspent_rub": 1766341.4,
+        "spend_rub": 841067.8,
+        "profit_rub": 267849.9,
+        "cells": 14484,
+        "unspent_rub": 1382990.4,
         "depths": {
-          "0.05": 1829
+          "0.01": 3553,
+          "0.02": 2748,
+          "0.03": 2215,
+          "0.04": 1537,
+          "0.05": 1319,
+          "0.06": 1017,
+          "0.07": 753,
+          "0.08": 525,
+          "0.09": 330,
+          "0.1": 195,
+          "0.11": 119,
+          "0.12": 78,
+          "0.13": 46,
+          "0.14": 27,
+          "0.15": 13,
+          "0.16": 7,
+          "0.17": 1,
+          "0.18": 1
         }
       }
     }
   },
   "vs_blanket": {
-    "profit_delta_rub": 995869.0,
-    "spend_delta_rub": -4019637.3,
-    "profit_per_ruble_blanket": -0.1714,
-    "profit_per_ruble_optimised": 0.4593
+    "profit_delta_rub": 1119358.2,
+    "spend_delta_rub": -3607048.7,
+    "profit_per_ruble_blanket": -0.1914,
+    "profit_per_ruble_optimised": 0.3185
   },
   "heuristic_check": {
-    "budget_rub": 563324.0,
+    "budget_rub": 556014.6,
     "cells": 5,
-    "greedy_profit_rub": 27.8,
-    "brute_force_profit_rub": 27.8,
-    "gap": 0.0
+    "greedy_profit_rub": 53.8,
+    "brute_force_profit_rub": 53.8,
+    "gap": -0.0
   },
   "robustness": [
     {
       "shock": 0.85,
-      "cells_selected": 1609,
-      "profit_rub": 150394.5,
-      "selection_changed_share": 0.1203
+      "cells_selected": 10931,
+      "profit_rub": 168174.9,
+      "selection_changed_share": 0.2043
     },
     {
       "shock": 1.15,
-      "cells_selected": 1996,
-      "profit_rub": 301900.9,
-      "selection_changed_share": 0.0913
+      "cells_selected": 17368,
+      "profit_rub": 382724.2,
+      "selection_changed_share": 0.1458
     }
   ]
 }

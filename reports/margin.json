@@ -3,64 +3,64 @@
     "dairy": {
       "cm_rate": 0.12,
       "supplier_funding": 0.267,
-      "breakeven_depth": 0.025,
-      "best_depth": 0.015,
-      "best_profit_per_base_unit": 0.0018,
-      "profit_at_10pct": -0.0457,
-      "profit_at_25pct": -0.2434
+      "breakeven_depth": 0.02,
+      "best_depth": 0.01,
+      "best_profit_per_base_unit": 0.0012,
+      "profit_at_10pct": -0.047,
+      "profit_at_25pct": -0.2414
     },
     "bakery": {
       "cm_rate": 0.3,
       "supplier_funding": 0.276,
-      "breakeven_depth": 0.1,
-      "best_depth": 0.05,
-      "best_profit_per_base_unit": 0.0096,
-      "profit_at_10pct": 0.0007,
-      "profit_at_25pct": -0.1042
+      "breakeven_depth": 0.085,
+      "best_depth": 0.04,
+      "best_profit_per_base_unit": 0.0062,
+      "profit_at_10pct": -0.0047,
+      "profit_at_25pct": -0.1088
     },
     "grocery": {
       "cm_rate": 0.22,
       "supplier_funding": 0.24,
-      "breakeven_depth": 0.1,
-      "best_depth": 0.05,
-      "best_profit_per_base_unit": 0.0169,
-      "profit_at_10pct": 0.0012,
-      "profit_at_25pct": -0.1608
+      "breakeven_depth": 0.09,
+      "best_depth": 0.045,
+      "best_profit_per_base_unit": 0.0138,
+      "profit_at_10pct": -0.003,
+      "profit_at_25pct": -0.162
     },
     "drinks": {
       "cm_rate": 0.26,
       "supplier_funding": 0.253,
-      "breakeven_depth": 0.045,
-      "best_depth": 0.025,
-      "best_profit_per_base_unit": 0.0025,
-      "profit_at_10pct": -0.0183,
-      "profit_at_25pct": -0.144
+      "breakeven_depth": 0.03,
+      "best_depth": 0.015,
+      "best_profit_per_base_unit": 0.0011,
+      "profit_at_10pct": -0.0222,
+      "profit_at_25pct": -0.1464
     },
     "frozen": {
       "cm_rate": 0.18,
       "supplier_funding": 0.245,
-      "breakeven_depth": 0.02,
+      "breakeven_depth": 0.01,
       "best_depth": 0.01,
-      "best_profit_per_base_unit": 0.0007,
-      "profit_at_10pct": -0.0344,
-      "profit_at_25pct": -0.1949
+      "best_profit_per_base_unit": 0.0001,
+      "profit_at_10pct": -0.0369,
+      "profit_at_25pct": -0.1946
     },
     "nonfood": {
       "cm_rate": 0.35,
       "supplier_funding": 0.263,
-      "breakeven_depth": 0.205,
-      "best_depth": 0.095,
-      "best_profit_per_base_unit": 0.0533,
-      "profit_at_10pct": 0.0531,
-      "profit_at_25pct": -0.0425
+      "breakeven_depth": 0.195,
+      "best_depth": 0.09,
+      "best_profit_per_base_unit": 0.0471,
+      "profit_at_10pct": 0.0465,
+      "profit_at_25pct": -0.0498
     }
   },
   "pnl": {
-    "revenue_delta_rub": 70502772.5,
-    "net_profit_rub": -17584046.0,
+    "revenue_delta_rub": 68495020.1,
+    "net_profit_rub": -24397020.0,
     "discount_cost_rub": 59976926.9,
     "supplier_funding_rub": 15584495.7,
-    "share_waves_negative_profit": 0.9532,
-    "share_revenue_up_profit_down": 0.9531
+    "share_waves_negative_profit": 0.9788,
+    "share_revenue_up_profit_down": 0.9787
   }
 }

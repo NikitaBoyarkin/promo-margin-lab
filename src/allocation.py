@@ -24,7 +24,8 @@ from config import CATEGORIES, CM_RATE
 from ledger import breakeven_table, fit_response
 
 KEY = ["store_id", "sku_id", "week"]
-DEPTHS = np.round(np.arange(0.05, 0.401, 0.05), 2)
+# 0.01 floor: category breakeven floors reach 2.0%, a 5% grid silently drops them
+DEPTHS = np.round(np.arange(0.01, 0.401, 0.01), 2)
 
 
 def _multipliers(
@@ -108,18 +109,57 @@ def option_table(cells: pd.DataFrame, curves: dict) -> pd.DataFrame:
 
 
 def greedy(table: pd.DataFrame, budget: float) -> dict:
-    ranked = table.assign(ratio=table["profit"] / table["cost"].clip(lower=1e-6))
-    ranked = ranked[ranked["profit"] > 0].sort_values("ratio", ascending=False)
-    chosen, spent, profit, used = [], 0.0, 0.0, set()
-    for row in ranked.itertuples():
-        if row.row in used:
+    """Marginal greedy: every cell starts unpromoted and is deepened only when
+    the next step pays for itself. Ranking whole options instead lets the
+    shallowest depth win every cell and leaves the budget unspent.
+    """
+    import heapq
+
+    g = table.sort_values(["row", "depth"]).reset_index(drop=True)
+    prof = g["profit"].to_numpy()
+    cost = g["cost"].to_numpy()
+    depths = g["depth"].to_numpy()
+    rows = g["row"].to_numpy()
+    row_index = pd.factorize(rows)[0]
+    n_rows = int(row_index.max()) + 1
+    counts = np.bincount(row_index, minlength=n_rows)
+    starts = np.searchsorted(row_index, np.arange(n_rows))
+
+    prev_prof = g.groupby("row")["profit"].shift(1).fillna(0.0).to_numpy()
+    prev_cost = g.groupby("row")["cost"].shift(1).fillna(0.0).to_numpy()
+    gain = prof - prev_prof
+    dcost = cost - prev_cost
+
+    pos = np.zeros(n_rows, dtype=int)
+    chosen: list[tuple[int, float]] = []
+    spent = 0.0
+    total = 0.0
+
+    def push(r: int) -> None:
+        k = pos[r]
+        if k >= counts[r]:
+            return
+        i = starts[r] + k
+        step = dcost[i]
+        ratio = gain[i] / max(step, 1e-6)
+        heapq.heappush(heap, (-ratio, int(rows[i]), r))
+
+    heap: list[tuple[float, int, int]] = []
+    for r in range(n_rows):
+        push(r)
+    while heap and spent < budget:
+        _, _, r = heapq.heappop(heap)
+        i = starts[r] + pos[r]
+        if gain[i] <= 0:
             continue
-        if spent + row.cost <= budget:
-            chosen.append((row.row, row.depth))
-            used.add(row.row)
-            spent += row.cost
-            profit += row.profit
-    return {"choices": chosen, "spend": spent, "profit": profit, "cells": len(chosen)}
+        if spent + dcost[i] > budget:
+            continue
+        spent += float(dcost[i])
+        total += float(gain[i])
+        pos[r] += 1
+        chosen.append((int(rows[i]), float(depths[i])))
+        push(r)
+    return {"choices": chosen, "spend": spent, "profit": total, "cells": len(chosen)}
 
 
 def blanket(cells: pd.DataFrame, depth: float, curves: dict) -> dict:

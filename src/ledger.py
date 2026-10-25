@@ -64,13 +64,18 @@ def build_waves(panel: pd.DataFrame, counterfactual: pd.DataFrame) -> pd.DataFra
         waves[column] = 0.0
 
     # --- pantry: same store-SKU, next 1..3 weeks, no new promo --------------
+    # The drag is booked on the *origin* wave, not on the lagged week: grouping
+    # by the shifted week silently dropped every lag-2/lag-3 row (no wave exists
+    # there) and flipped the bucket's sign.
     promo = df.loc[df["promo_flag"], ["store_id", "sku_id", "week", "category"]].copy()
     for lag in (1, 2, 3):
         q = promo.copy()
+        q["origin_week"] = q["week"]
         q["week"] = q["week"] + lag
         q = q.merge(df[KEY + ["dev_units", "dev_profit", "promo_flag"]], on=KEY, how="left")
         q["promo_flag"] = q["promo_flag"].fillna(False).astype(bool)
         q = q[~q["promo_flag"]]
+        q["week"] = q["origin_week"]
         agg = (
             q.groupby(WAVE, as_index=False)[["dev_units", "dev_profit"]]
             .sum()
@@ -257,11 +262,42 @@ def summarise(waves: pd.DataFrame, panel: pd.DataFrame, curves: dict) -> dict:
     }
 
 
+def pnl_bridge(panel: pd.DataFrame, counterfactual: pd.DataFrame, waves: pd.DataFrame) -> dict:
+    """Exact decomposition of net profit into volume margin and discount cost.
+
+    ``own_profit = sum[(U - B) p c] - sum[U d (1 - f) p]`` holds per cell, so the
+    two lines below add up to the promo-cell profit by construction, and adding
+    the spillover buckets reproduces ``net_profit_rub``.
+    """
+    df = panel.merge(counterfactual, on=KEY, how="left", validate="one_to_one")
+    cell = df[df["promo_flag"]]
+    units = cell["units_sold"].to_numpy()
+    base = cell["baseline"].to_numpy()
+    price = cell["list_price"].to_numpy()
+    cm = cell["cm_rate"].to_numpy()
+    depth = cell["promo_depth"].to_numpy()
+    funded = cell["funded_share"].to_numpy()
+
+    volume = float((((units - base) * price) * cm).sum())
+    discount = -float((((units * depth) * price) * (1.0 - funded)).sum())
+    spillover = float(
+        waves[["pantry_profit", "cannibalization_profit", "halo_profit"]].sum().sum()
+    )
+    return {
+        "margin_on_incremental_units_rub": round(volume, 1),
+        "discount_net_of_supplier_funding_rub": round(discount, 1),
+        "promo_cells_profit_rub": round(volume + discount, 1),
+        "spillover_profit_rub": round(spillover, 1),
+        "net_profit_rub": round(volume + discount + spillover, 1),
+    }
+
+
 def run(panel: pd.DataFrame, counterfactual: pd.DataFrame, truth: pd.DataFrame) -> dict:
     waves = build_waves(panel, counterfactual)
     curves = fit_response(panel, counterfactual)
     summary = summarise(waves, panel, curves)
     summary["breakeven"] = breakeven_table(panel, curves)
+    summary["pnl_bridge"] = pnl_bridge(panel, counterfactual, waves)
 
     oracle_cf = panel[KEY].copy()
     oracle_cf["baseline"] = truth.sort_values(KEY)["truth_base_units"].to_numpy()

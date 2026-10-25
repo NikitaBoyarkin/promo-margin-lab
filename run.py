@@ -312,15 +312,23 @@ def main(argv: list[str] | None = None) -> int:
             f"gap={info['heuristic_check']['gap']:.2%}"
         )
     if args.stage in ("spark", "all"):
-        info = stage_spark(cfg)
-        parity = info["parity"]
-        scale = info["scale"]
-        print(
-            f"  spark: parity={'OK' if parity['ok'] else 'FAIL'} "
-            f"diff={parity['max_abs_diff_overall']:.1e} "
-            f"rows={parity['rows_compared']} "
-            f"scale={scale['rows']:,} in {scale['seconds']:.1f}s"
-        )
+        try:
+            info = stage_spark(cfg)
+        except ModuleNotFoundError as exc:
+            # pyspark lives in the optional `spark` group; `--stage all` must not
+            # die on the last stage for a reader who ran a plain `uv sync`
+            if args.stage == "spark":
+                raise
+            print(f"  spark: skipped ({exc.name} missing — uv sync --group spark)")
+        else:
+            parity = info["parity"]
+            scale = info["scale"]
+            print(
+                f"  spark: parity={'OK' if parity['ok'] else 'FAIL'} "
+                f"diff={parity['max_abs_diff_overall']:.1e} "
+                f"rows={parity['rows_compared']} "
+                f"scale={scale['rows']:,} in {scale['seconds']:.1f}s"
+            )
     return 0
 
 

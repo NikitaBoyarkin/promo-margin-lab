@@ -94,8 +94,8 @@ corrupted return count fails validation.
 ## Reproducibility
 
 `uv run python run.py --stage all` on a clean clone reproduces every number in
-the README from `seed = 42`. `--fast` uses 20 stores / 18 SKUs / 26 weeks: same
-code path, CI only, **never cited as a headline number**. `paths.frame_hash`
+the README from `seed = 42`. `--fast` uses 40 stores / 30 SKUs / 52 weeks (62,400
+cells): same code path, CI only, **never cited as a headline number**. `paths.frame_hash`
 hashes values, not parquet bytes, so it is stable across machines.
 
 ## Known limits (honest)

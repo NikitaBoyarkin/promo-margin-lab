@@ -29,6 +29,7 @@ NON_FEATURE = {
     "cm",
     "discount_cost",
     "promo_cost",
+    "supplier_funding",
 }
 
 

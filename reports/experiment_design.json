@@ -10,15 +10,15 @@
     "target_power": 0.8
   },
   "variance": {
-    "icc": 0.138,
-    "between_store_sd": 884.0,
-    "residual_sd": 2125.72,
+    "icc": 0.2197,
+    "between_store_sd": 1168.59,
+    "residual_sd": 2154.04,
     "stores": 120,
     "weeks": 78
   },
   "mde": {
-    "rub_per_store_week": 611.7,
-    "sigma_store": 1195.8,
+    "rub_per_store_week": 786.1,
+    "sigma_store": 1537.0,
     "analytic_power": 0.8
   }
 }

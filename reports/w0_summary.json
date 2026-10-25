@@ -24,8 +24,7 @@
     "mechanic",
     "funded_share",
     "list_price",
-    "supplier_funding",
     "cm_rate"
   ],
-  "n_features": 7
+  "n_features": 6
 }
