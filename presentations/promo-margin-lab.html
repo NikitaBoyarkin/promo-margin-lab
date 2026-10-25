@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Promo Margin Lab — цена промо в рублях маржи</title>
+<style>
+  :root{
+    --paper:#0f2a2b;
+    --panel:#143436;
+    --panel-2:#173d3d;
+    --line:rgba(159,196,190,.18);
+    --ink:#e9f1ec;
+    --muted:#93adaa;
+    --teal:#5fd3c4;
+    --pos:#7fd1a8;
+    --neg:#e08a72;
+    --warn:#e8c37a;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    --sanz:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  html{height:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sanz);
+    -webkit-font-smoothing:antialiased;
+    font-feature-settings:"tnum" 0;
+  }
+  .deck{
+    position:relative;
+    display:flex;
+    flex-direction:row;
+    height:100vh;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    scrollbar-width:none;
+  }
+  .deck::-webkit-scrollbar{display:none}
+
+  .slide{
+    flex:0 0 100vw;
+    width:100vw;
+    height:100vh;
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
+    padding:clamp(26px,4.6vh,44px) clamp(38px,5.4vw,78px);
+    display:flex;
+    flex-direction:column;
+    gap:clamp(8px,2.0vh,20px);
+    overflow:hidden;
+    border-right:1px solid var(--line);
+    position:relative;
+  }
+
+  .kicker{
+    font-family:var(--mono);
+    font-size:clamp(9.5px,1.42vh,12px);
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--teal);
+    display:flex;
+    gap:14px;
+    align-items:baseline;
+    flex-wrap:wrap;
+  }
+  .kicker .dim{color:var(--muted);letter-spacing:.08em}
+
+  h1{
+    font-size:clamp(30px,6.1vh,58px);
+    line-height:1.04;
+    letter-spacing:-.022em;
+    margin:0;
+    font-weight:650;
+    max-width:19ch;
+  }
+  h1 .accent{color:var(--teal)}
+  h2{
+    font-size:clamp(21px,3.95vh,36px);
+    line-height:1.1;
+    letter-spacing:-.016em;
+    margin:0;
+    font-weight:620;
+    max-width:26ch;
+  }
+  h2 .accent{color:var(--teal)}
+  p.lede{
+    font-size:clamp(13px,2.05vh,18px);
+    line-height:1.42;
+    color:var(--ink);
+    margin:0;
+    max-width:74ch;
+  }
+  p.note{
+    font-size:clamp(11.5px,1.72vh,15px);
+    line-height:1.45;
+    color:var(--muted);
+    margin:0;
+    max-width:86ch;
+  }
+  strong{font-weight:650}
+  .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pos{color:var(--pos)}
+  .neg{color:var(--neg)}
+  .teal{color:var(--teal)}
+  .warn{color:var(--warn)}
+
+  .src{
+    font-family:var(--mono);
+    font-size:clamp(8.5px,1.24vh,10.5px);
+    color:var(--muted);
+    letter-spacing:.02em;
+  }
+  .foot{
+    margin-top:auto;
+    padding-top:clamp(6px,1.2vh,12px);
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    gap:24px;
+    align-items:baseline;
+    flex-wrap:wrap;
+  }
+  .foot .src{font-size:clamp(8.5px,1.2vh,10.5px)}
+  .foot .pg{font-family:var(--mono);font-size:clamp(8.5px,1.2vh,10.5px);color:var(--muted)}
+
+  /* ---------- slide 1 ---------- */
+  .hero{justify-content:flex-start;gap:clamp(14px,2.6vh,26px)}
+  .hero .hero-body{margin:auto 0;display:flex;flex-direction:column;gap:clamp(14px,2.6vh,26px)}
+  .hero .rule{width:clamp(48px,6vw,84px);height:2px;background:var(--teal);margin:clamp(4px,1vh,10px) 0}
+  .two-sign{display:flex;gap:clamp(20px,4vw,64px);flex-wrap:wrap;margin-top:clamp(6px,1.4vh,14px)}
+  .two-sign .item{border-left:2px solid var(--line);padding-left:clamp(14px,1.6vw,22px)}
+  .two-sign .item.p{border-left-color:var(--pos)}
+  .two-sign .item.n{border-left-color:var(--neg)}
+  .two-sign .big{
+    font-size:clamp(22px,4.4vh,40px);
+    font-weight:640;
+    letter-spacing:-.02em;
+    line-height:1.05;
+    font-variant-numeric:tabular-nums;
+  }
+  .two-sign .cap{font-size:clamp(11px,1.6vh,14px);color:var(--muted);margin-top:4px}
+  .meta{display:flex;gap:clamp(16px,2.4vw,36px);flex-wrap:wrap;font-family:var(--mono);font-size:clamp(10px,1.42vh,12px);color:var(--muted)}
+
+  /* ---------- generic grids ---------- */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2.4vw,40px);align-items:start}
+  .cards{display:grid;gap:clamp(10px,1.95vh,20px)}
+  .cards.c3{grid-template-columns:repeat(3,1fr)}
+  .cards.c4{grid-template-columns:repeat(4,1fr)}
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:clamp(10px,2.35vh,24px) clamp(12px,1.5vw,20px);
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    min-width:0;
+  }
+  .card .v{
+    font-size:clamp(20px,4.5vh,38px);
+    font-weight:640;
+    letter-spacing:-.02em;
+    line-height:1.02;
+    font-variant-numeric:tabular-nums;
+  }
+  .card .v.sm{font-size:clamp(17px,3.6vh,30px)}
+  .card .k{font-size:clamp(10.5px,1.5vh,13px);color:var(--muted);line-height:1.35}
+
+  /* ---------- pipeline ---------- */
+  .pipe{display:grid;grid-template-columns:repeat(7,1fr);gap:clamp(6px,.8vw,12px);align-items:stretch}
+  .step{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:clamp(8px,1.5vh,14px) clamp(8px,.8vw,12px);
+    display:flex;flex-direction:column;gap:6px;min-width:0;
+  }
+  .step .ix{font-family:var(--mono);font-size:clamp(8.5px,1.2vh,10.5px);color:var(--teal);letter-spacing:.1em}
+  .step .tx{font-size:clamp(10.5px,1.55vh,13.5px);line-height:1.3;color:var(--ink)}
+
+  /* ---------- table ---------- */
+  table{width:100%;border-collapse:collapse;font-size:clamp(11.5px,1.72vh,15px)}
+  th,td{text-align:left;padding:clamp(5px,.95vh,10px) clamp(6px,.7vw,12px);border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:500;font-size:clamp(9.5px,1.34vh,11.5px);letter-spacing:.08em;text-transform:uppercase}
+  td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  tr.best td{background:rgba(95,211,196,.07)}
+  tr.best td:first-child{box-shadow:inset 3px 0 0 var(--teal)}
+
+  /* ---------- bridge bars ---------- */
+  .bridge{display:flex;flex-direction:column;gap:clamp(7px,1.85vh,19px)}
+  .brow{display:grid;grid-template-columns:minmax(180px,1.25fr) 3fr minmax(120px,auto);gap:clamp(8px,1.2vw,18px);align-items:center}
+  .brow .lbl{font-size:clamp(10.5px,1.55vh,13.5px);color:var(--ink);line-height:1.25}
+  .brow .val{font-family:var(--mono);font-size:clamp(11px,1.7vh,15px);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .track{height:clamp(12px,2.6vh,24px);background:rgba(159,196,190,.08);border-radius:2px;display:flex;align-items:center;overflow:hidden}
+  .bar{height:100%;border-radius:2px}
+  .bar.p{background:linear-gradient(90deg,rgba(127,209,168,.55),var(--pos))}
+  .bar.n{background:linear-gradient(90deg,rgba(224,138,114,.5),var(--neg))}
+  .bar.tot{background:none;border:1.5px solid var(--neg);border-left:none}
+  .brow.total .lbl{font-weight:640}
+  .brow.total .val{font-weight:650}
+
+  /* ---------- breakeven ---------- */
+  .be{display:flex;flex-direction:column;gap:clamp(5px,1.55vh,15px)}
+  .berow{display:grid;grid-template-columns:minmax(96px,auto) 1fr minmax(150px,auto);gap:clamp(8px,1.1vw,16px);align-items:center}
+  .berow .cat{font-size:clamp(10.5px,1.55vh,13.5px)}
+  .berow .v{font-family:var(--mono);font-size:clamp(10.5px,1.6vh,14px);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--muted)}
+  .berow .v b{color:var(--neg);font-weight:640}
+  .betrack{
+    height:clamp(11px,2.4vh,22px);border-radius:2px;
+    background:
+      linear-gradient(90deg,transparent calc(84.77% - 1px),var(--neg) calc(84.77% - 1px),var(--neg) calc(84.77% + 1px),transparent calc(84.77% + 1px)),
+      rgba(159,196,190,.08);
+  }
+  .betrack .fill{height:100%;background:linear-gradient(90deg,rgba(95,211,196,.45),rgba(95,211,196,.85));border-radius:2px}
+
+  /* ---------- misc ---------- */
+  .bigline{display:flex;gap:clamp(18px,3vw,48px);flex-wrap:wrap;align-items:flex-end}
+  .bigline .unit{font-size:clamp(10.5px,1.5vh,13px);color:var(--muted);padding-bottom:8px}
+  .huge{
+    font-size:clamp(28px,7.0vh,60px);
+    font-weight:650;
+    letter-spacing:-.025em;
+    line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  ul.plain{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:clamp(5px,1.1vh,11px)}
+  ul.plain li{
+    font-size:clamp(11.5px,1.72vh,15px);
+    line-height:1.4;
+    padding-left:16px;
+    position:relative;
+    color:var(--ink);
+  }
+  ul.plain li::before{
+    content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;background:var(--teal);border-radius:50%;
+  }
+  ul.plain li.dim{color:var(--muted)}
+  ul.plain li.dim::before{background:var(--muted)}
+  .divider{height:1px;background:var(--line);margin:clamp(2px,.6vh,8px) 0}
+  .tag{
+    display:inline-block;font-family:var(--mono);font-size:clamp(9px,1.28vh,11px);
+    border:1px solid var(--line);border-radius:2px;padding:2px 6px;color:var(--muted);letter-spacing:.06em;
+  }
+  .tag.t{border-color:rgba(95,211,196,.45);color:var(--teal)}
+  .tag.n{border-color:rgba(224,138,114,.45);color:var(--neg)}
+
+  /* ---------- evidence slide ---------- */
+  .evidence{display:grid;grid-template-columns:minmax(0,468px) 1fr;gap:clamp(18px,2.6vw,40px);align-items:start;min-height:0}
+  .shot{
+    background:var(--panel);border:1px solid var(--line);border-radius:3px;
+    padding:6px;display:flex;flex-direction:column;gap:4px;
+  }
+  .shot img{max-height:70vh;max-width:100%;width:auto;height:auto;object-fit:contain;display:block;border-radius:2px}
+  .shot .cap{font-family:var(--mono);font-size:clamp(8px,1.15vh,10px);color:var(--muted);line-height:1.35}
+
+  /* ---------- HUD ---------- */
+  .hud{
+    position:fixed;right:clamp(12px,1.6vw,22px);bottom:clamp(8px,1.4vh,16px);
+    display:flex;gap:12px;align-items:center;
+    font-family:var(--mono);font-size:clamp(9px,1.28vh,11px);
+    color:var(--muted);letter-spacing:.06em;
+    background:rgba(15,42,43,.82);
+    border:1px solid var(--line);border-radius:3px;
+    padding:5px 10px;z-index:20;
+  }
+  .hud .count{color:var(--ink);font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
+  .hud .sep{width:1px;height:11px;background:var(--line)}
+
+  /* ---------- print ---------- */
+  @page{size:A4 landscape;margin:0}
+  @media print{
+    html,body{height:auto;background:var(--paper)}
+    body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .deck{display:block;height:auto;overflow:visible;scroll-snap-type:none;scroll-behavior:auto}
+    .slide{
+      width:297mm;height:210mm;flex:none;overflow:hidden;
+      page-break-after:always;break-after:page;
+      page-break-inside:avoid;break-inside:avoid;
+      padding:9mm 13mm;
+    }
+    .slide:last-child{page-break-after:auto;break-after:auto}
+    .hud{display:none}
+    .shot img{max-height:150mm}
+    .bar,.betrack .fill,.card,.step,.tag{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- 1 -->
+  <section class="slide hero" id="s1" aria-label="Титул">
+    <div class="hero-body">
+    <div class="kicker">promo-margin-lab<span class="dim">commit f4e6d9d · панель ae38964b1eb003e9</span></div>
+    <h1>Promo Margin Lab — <span class="accent">цена промо в рублях маржи</span></h1>
+    <div class="rule"></div>
+    <p class="lede">Одно измерение возвращает два знака: выручка растёт, маржинальная прибыль падает. Решение принимается по второму.</p>
+    <div class="two-sign">
+      <div class="item p">
+        <div class="big pos">+68 495 020 ₽</div>
+        <div class="cap">прирост выручки</div>
+      </div>
+      <div class="item n">
+        <div class="big neg">−24 397 020 ₽</div>
+        <div class="cap">прирост contribution margin</div>
+      </div>
+    </div>
+    <div class="meta">
+      <span>2026-10-25</span>
+      <span>120 магазинов × 60 SKU × 78 недель</span>
+      <span>reports/margin.json</span>
+    </div>
+    </div>
+    <div class="foot">
+      <span class="src">Все числа — из reports/*.json, пересобранных на коммите f4e6d9d</span>
+      <span class="pg">1 / 12</span>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide" id="s2" aria-label="Рамка">
+    <div class="kicker">рамка <span class="dim">одно измерение, два знака</span></div>
+    <h2>Выручка и маржа расходятся — <span class="accent">это и есть результат</span></h2>
+    <div class="cols" style="margin-top:clamp(4px,1vh,12px)">
+      <div class="cards">
+        <div class="card">
+          <div class="v pos">+68 495 020 ₽</div>
+          <div class="k">Δ выручки за 78 недель панели</div>
+        </div>
+        <div class="card">
+          <div class="v neg">−24 397 020 ₽</div>
+          <div class="k">Δ contribution margin за тот же период</div>
+        </div>
+      </div>
+      <div>
+        <ul class="plain">
+          <li>Отрицательная маржа — не сорванный эксперимент. Это то, что возвращает корректное измерение, когда скидка начисляется и на юниты, которые продались бы по полной цене.</li>
+          <li>Выручка растёт почти всегда: <span class="num">97,87%</span> волн — выручка вверх, прибыль вниз. Знак выручки не различает хорошее промо и плохое.</li>
+          <li>Решение следует сразу: ограничить глубину, финансировать только ячейки с положительной ожидаемой маржой.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot">
+      <span class="src">reports/margin.json · pnl.revenue_delta_rub, pnl.net_profit_rub, pnl.share_revenue_up_profit_down</span>
+      <span class="pg">2 / 12</span>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide" id="s3" aria-label="Как меряют обычно">
+    <div class="kicker">ситуация <span class="dim">среднее пре-периода</span></div>
+    <h2>Так промо меряют обычно — <span class="accent">и поэтому не решают</span></h2>
+    <div class="cols" style="margin-top:clamp(4px,1vh,12px)">
+      <div>
+        <p class="lede" style="margin-bottom:clamp(8px,1.5vh,16px)">Базовая линия = среднее продаж за N недель до промо. Лифт = факт минус это среднее. Число почти всегда положительное, поэтому вопроса «делать или нет» оно не ставит.</p>
+        <ul class="plain">
+          <li>Среднее пре-периода предполагает, что уровень повторится без тренда и сезонности.</li>
+          <li>Не учитывает, что часть промо-объёма съел бы и обычный спрос по полной цене.</li>
+          <li>Считает выручку, а скидка — это расход. Знак прибыли из него не выводится.</li>
+        </ul>
+      </div>
+      <div class="cards" style="grid-template-columns:1fr 1fr">
+        <div class="card">
+          <div class="v neg">24,49%</div>
+          <div class="k">WAPE наивного среднего на 16-недельном холдауте</div>
+        </div>
+        <div class="card">
+          <div class="v neg">−19,90%</div>
+          <div class="k">смещение: лифт систематически занижен на пятую часть</div>
+        </div>
+        <div class="card" style="grid-column:1 / -1">
+          <div class="v sm">37 016 промо-ячеек <span class="teal">·</span> средняя глубина 25,43%</div>
+          <div class="k">именно эту базу наивный метод и недооценивает — 6,59% панели</div>
+        </div>
+      </div>
+    </div>
+    <div class="foot">
+      <span class="src">reports/baseline.json · estimators.naive; reports/ledger.json · summary.promoted_cells</span>
+      <span class="pg">3 / 12</span>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide" id="s4" aria-label="Метод">
+    <div class="kicker">метод <span class="dim">один ряд, семь шагов</span></div>
+    <h2>От ground truth до аллокации — <span class="accent">проверяемая цепочка</span></h2>
+    <div class="pipe" style="margin-top:clamp(6px,1.4vh,16px)">
+      <div class="step"><div class="ix">01</div><div class="tx">Синтетическая панель с известным ground truth</div></div>
+      <div class="step"><div class="ix">02</div><div class="tx">Контрфактуал: что было бы без промо</div></div>
+      <div class="step"><div class="ix">03</div><div class="tx">Реестр четырёх корзин: own, pantry, cannibalization, halo</div></div>
+      <div class="step"><div class="ix">04</div><div class="tx">P&amp;L и breakeven по категориям</div></div>
+      <div class="step"><div class="ix">05</div><div class="tx">Cluster RCT, проверенный симуляцией</div></div>
+      <div class="step"><div class="ix">06</div><div class="tx">Модель отклика: инкрементальная CM на ячейку</div></div>
+      <div class="step"><div class="ix">07</div><div class="tx">Аллокация бюджета под ограничением</div></div>
+    </div>
+    <div class="cards c4" style="margin-top:clamp(8px,1.8vh,20px)">
+      <div class="card"><div class="v">561 600</div><div class="k">ячеек панели</div></div>
+      <div class="card"><div class="v">120 × 60 × 78</div><div class="k">магазины × SKU × недели</div></div>
+      <div class="card"><div class="v sm">37 016</div><div class="k">промо-ячеек, 6,59%</div></div>
+      <div class="card"><div class="v sm" style="font-family:var(--mono);font-size:clamp(14px,2.1vh,20px)">ae38964b1eb003e9</div><div class="k">hash панели</div></div>
+    </div>
+    <p class="note" style="margin-top:auto">Панель синтетическая — поэтому известен истинный лифт (<span class="num">968 245,7</span> юнитов) и каждое звено сверяется с ним, а не только само с собой.</p>
+    <div class="foot">
+      <span class="src">reports/w0_summary.json · reports/ledger.json · reports/baseline.json</span>
+      <span class="pg">4 / 12</span>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide" id="s5" aria-label="Контрфактуал">
+    <div class="kicker">контрфактуал <span class="dim">16-недельный холдаут</span></div>
+    <h2>Три оценки одного лифта — <span class="accent">и разница в 5,32×</span></h2>
+    <table style="margin-top:clamp(4px,1.2vh,14px)">
+      <thead>
+        <tr><th>Оценщик</th><th style="text-align:right">WAPE</th><th style="text-align:right">смещение</th><th>что делает</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Среднее пре-периода (naive)</td>
+          <td class="n">24,49%</td>
+          <td class="n neg">−19,90%</td>
+          <td>уровень повторяется, тренда нет</td>
+        </tr>
+        <tr class="best">
+          <td>Прогноз модели <span class="tag t">forecast</span></td>
+          <td class="n pos">7,64%</td>
+          <td class="n pos">−3,74%</td>
+          <td>тренд, сезонность, история SKU</td>
+        </tr>
+        <tr>
+          <td>Подобранный контроль (matched)</td>
+          <td class="n">20,33%</td>
+          <td class="n neg">−14,02%</td>
+          <td>похожий магазин × SKU, без промо</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="bigline" style="margin-top:clamp(8px,1.8vh,20px)">
+      <div><div class="huge teal">5,32×</div><div class="unit">сокращение смещения: forecast против naive</div></div>
+      <div><div class="huge teal">3,21×</div><div class="unit">сокращение WAPE</div></div>
+      <div><div class="huge">968 245,7</div><div class="unit">юнитов — истинный лифт по ground truth</div></div>
+    </div>
+    <p class="note" style="margin-top:auto">База для всех трёх — одни и те же 37 016 промо-ячеек последних 16 недель, поэтому разница в числах — это разница методов, а не выборки.</p>
+    <div class="foot">
+      <span class="src">reports/baseline.json · estimators.*.wape_pct, bias_pct; summary.bias_reduction_forecast_vs_naive</span>
+      <span class="pg">5 / 12</span>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="slide" id="s6" aria-label="Реестр корзин">
+    <div class="kicker">реестр <span class="dim">9 053 волны промо</span></div>
+    <h2>Лифт в собственной корзине — <span class="accent">и что забирают соседи</span></h2>
+    <div class="cards c4" style="margin-top:clamp(6px,1.4vh,16px)">
+      <div class="card"><div class="v pos">+932 049,8</div><div class="k">own — прирост в самом SKU</div></div>
+      <div class="card"><div class="v">+740 541,3</div><div class="k">net — после трёх корзин</div></div>
+      <div class="card"><div class="v neg">−20,55%</div><div class="k">net против own</div></div>
+      <div class="card"><div class="v sm">−183 607,8</div><div class="k">network shift — диагностика, вне net</div></div>
+    </div>
+    <div class="cols" style="margin-top:clamp(6px,1.4vh,16px)">
+      <div class="bridge">
+        <div class="brow">
+          <div class="lbl">own</div>
+          <div class="track"><div class="bar p" style="width:100%"></div></div>
+          <div class="val pos">+932 049,8</div>
+        </div>
+        <div class="brow">
+          <div class="lbl">pantry — вытягивание из запасов</div>
+          <div class="track"><div class="bar n" style="width:21.4%"></div></div>
+          <div class="val neg">−199 865,4</div>
+        </div>
+        <div class="brow">
+          <div class="lbl">cannibalization — каннибализация</div>
+          <div class="track"><div class="bar n" style="width:19.0%"></div></div>
+          <div class="val neg">−176 886,7</div>
+        </div>
+        <div class="brow">
+          <div class="lbl">halo — спрос на полке вокруг</div>
+          <div class="track"><div class="bar p" style="width:19.9%"></div></div>
+          <div class="val pos">+185 243,5</div>
+        </div>
+      </div>
+      <div>
+        <p class="note" style="margin-bottom:clamp(6px,1.2vh,12px)">Длина полосы — модуль юнитов, знак — в числе. Три корзины входят в net, network shift (кросс-форматный переток) остаётся диагностикой.</p>
+        <ul class="plain">
+          <li>Пятая часть собственного прироста — не прирост: <span class="num">20,55%</span> забирают запасы и соседние SKU.</li>
+          <li>Сверка с DGP: net-юниты <span class="num">−1,06%</span>, net-прибыль <span class="num">+0,18%</span> против оракула.</li>
+          <li>Ошибка реестра ниже ошибки контрфактуала — корзины не маскируют друг друга.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot">
+      <span class="src">reports/ledger.json · summary.own_lift_units, net_lift_units, leak_share, reconciliation.*.error_pct</span>
+      <span class="pg">6 / 12</span>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide" id="s7" aria-label="P&L мост">
+    <div class="kicker">P&amp;L · ядро <span class="dim">откуда ровно −24,4 млн ₽</span></div>
+    <h2>Мост прибыли: маржа объёма <span class="accent">проигрывает скидке</span></h2>
+    <div class="bridge" style="margin-top:clamp(8px,1.8vh,22px)">
+      <div class="brow">
+        <div class="lbl">Маржа на инкрементальных юнитах</div>
+        <div class="track"><div class="bar p" style="width:56.9%"></div></div>
+        <div class="val pos">+25 270 023 ₽</div>
+      </div>
+      <div class="brow">
+        <div class="lbl">Скидка нетто от поставщиков <span class="src">(59,98 млн − 15,58 млн funding)</span></div>
+        <div class="track"><div class="bar n" style="width:100%"></div></div>
+        <div class="val neg">−44 392 430 ₽</div>
+      </div>
+      <div class="brow total">
+        <div class="lbl">= Итог на промо-ячейках</div>
+        <div class="track"><div class="bar tot" style="width:43.1%"></div></div>
+        <div class="val neg">−19 122 407 ₽</div>
+      </div>
+      <div class="brow">
+        <div class="lbl">Спилловер за пределы промо-ячеек</div>
+        <div class="track"><div class="bar n" style="width:11.9%"></div></div>
+        <div class="val neg">−5 274 625 ₽</div>
+      </div>
+      <div class="brow total">
+        <div class="lbl">= Итог по сети</div>
+        <div class="track"><div class="bar tot" style="width:55.0%"></div></div>
+        <div class="val neg">−24 397 032 ₽</div>
+      </div>
+    </div>
+    <div class="cards c3" style="margin-top:clamp(8px,1.8vh,20px)">
+      <div class="card"><div class="v neg">97,88%</div><div class="k">волн с отрицательной прибылью — 8 861 из 9 053</div></div>
+      <div class="card"><div class="v neg sm">−2 050,6 ₽</div><div class="k">медианная волна промо</div></div>
+      <div class="card"><div class="v sm">0,3185 vs −0,1914</div><div class="k">₽ прибыли на ₽ скидки: оптимизация против blanket 15%</div></div>
+    </div>
+    <div class="foot">
+      <span class="src">reports/ledger.json · summary.pnl_bridge, median_net_profit_rub; reports/policy.json · vs_blanket</span>
+      <span class="pg">7 / 12</span>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="slide" id="s8" aria-label="Breakeven">
+    <div class="kicker">breakeven <span class="dim">потолок глубины по категории</span></div>
+    <h2>Глубина 25,43% <span class="accent">выше потолка во всех шести категориях</span></h2>
+    <div class="be" style="margin-top:clamp(6px,1.6vh,18px)">
+      <div class="berow"><div class="cat">frozen</div><div class="betrack"><div class="fill" style="width:3.33%"></div></div><div class="v">1,0% потолок · <b>−19,5% маржи</b></div></div>
+      <div class="berow"><div class="cat">dairy</div><div class="betrack"><div class="fill" style="width:6.67%"></div></div><div class="v">2,0% потолок · <b>−24,1% маржи</b></div></div>
+      <div class="berow"><div class="cat">drinks</div><div class="betrack"><div class="fill" style="width:10%"></div></div><div class="v">3,0% потолок · <b>−14,6% маржи</b></div></div>
+      <div class="berow"><div class="cat">bakery</div><div class="betrack"><div class="fill" style="width:28.33%"></div></div><div class="v">8,5% потолок · <b>−10,9% маржи</b></div></div>
+      <div class="berow"><div class="cat">grocery</div><div class="betrack"><div class="fill" style="width:30%"></div></div><div class="v">9,0% потолок · <b>−16,2% маржи</b></div></div>
+      <div class="berow"><div class="cat">nonfood</div><div class="betrack"><div class="fill" style="width:65%"></div></div><div class="v">19,5% потолок · <b>−5,0% маржи</b></div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:clamp(3px,.8vh,8px)">
+      <span class="src">полоса — потолок глубины; пунктир — фактическое среднее 25,43%</span>
+      <span class="src">при 25% прибыль отрицательна в 6/6 категориях</span>
+    </div>
+    <p class="note" style="margin-top:auto">Потолок считается из ставки маржи и доли финансирования поставщиком: чем ниже собственная маржа категории, тем меньше скидка окупается. Это не «урезать промо», а «назвать цену каждой глубины».</p>
+    <div class="foot">
+      <span class="src">reports/margin.json · breakeven.*.breakeven_depth, profit_at_25pct; reports/policy.json · depth_cap_by_category, candidates 4 756</span>
+      <span class="pg">8 / 12</span>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="slide" id="s9" aria-label="Эксперимент">
+    <div class="kicker">эксперимент <span class="dim">дизайн, проверенный симуляцией</span></div>
+    <h2>Дизайн знает свою ошибку <span class="accent">до запуска</span></h2>
+    <div class="cards c4" style="margin-top:clamp(8px,1.8vh,20px)">
+      <div class="card"><div class="v">120 / 60 / 8</div><div class="k">магазинов · на плечо · недель, cluster RCT на уровне магазина, α = 0,05</div></div>
+      <div class="card"><div class="v">0,3572</div><div class="k">ICC, gross base, окно 8 недель — та база, что используется в power и MDE</div></div>
+      <div class="card"><div class="v sm">786 ₽</div><div class="k">MDE на магазин-неделю = 0,367% недельной выручки (213 927,8 ₽)</div></div>
+      <div class="card"><div class="v pos">77,8%</div><div class="k">power на MDE при 1 000 симуляциях</div></div>
+    </div>
+    <div class="cols" style="margin-top:clamp(10px,2vh,22px)">
+      <div>
+        <p class="note" style="margin-bottom:clamp(6px,1.2vh,12px)">ICC зависит от базы и окна — её нельзя называть без обоих. Здесь: <span class="num">0,3572</span> gross base в 8-недельном окне; на net-марже за 78 недель панели — <span class="num">0,2197</span>.</p>
+        <ul class="plain">
+          <li>FPR <span class="num">4,3%</span> на 1 000 нулевых разбиений — ложное срабатывание под контролем.</li>
+          <li>CI покрывает инжектированный эффект в <span class="num">95,3%</span> прогонов.</li>
+          <li>Switchback как запасной дизайн: 5,2% на нуле, 98,6% на MDE, carryover восстанавливается как 0,495.</li>
+        </ul>
+      </div>
+      <div style="display:flex;gap:clamp(18px,2.6vw,44px);flex-wrap:wrap;align-items:flex-end">
+        <div><div class="huge neg">4,3%</div><div class="unit">FPR на нуле, 1 000 реплик</div></div>
+        <div><div class="huge">95,3%</div><div class="unit">покрытие 95%-CI</div></div>
+        <div><div class="huge teal">5,2 → 98,6%</div><div class="unit">switchback: нуль → MDE, 500 реплик</div></div>
+      </div>
+    </div>
+    <div class="foot">
+      <span class="src">reports/experiment_design.json · design, variance.icc, mde; reports/ab_test_readiness.json · variance.gross_base_window.icc, mde.revenue_per_store_week; reports/simulation.json · cluster_rct.*</span>
+      <span class="pg">9 / 12</span>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="slide" id="s10" aria-label="Ранжирование">
+    <div class="kicker">ранжирование <span class="dim">Qini ≠ решение</span></div>
+    <h2>Отличный ранжировщик <span class="accent">и убыточная политика</span></h2>
+    <div class="bigline" style="margin-top:clamp(6px,1.4vh,16px)">
+      <div><div class="huge teal">0,9629</div><div class="unit">Qini [0,9582; 0,9666] · AUUC 1 008 488 ₽ · ρ(score, effect) 0,9498</div></div>
+    </div>
+    <div class="cards c3" style="margin-top:clamp(8px,1.8vh,20px)">
+      <div class="card"><div class="v neg sm">−55 396 ₽</div><div class="k">qini_rank — топ-20% по скору, 1 538 ячеек</div></div>
+      <div class="card"><div class="v pos sm">+54 361 ₽</div><div class="k">threshold — только ячейки с положительной ожидаемой маржой, 285 из 7 691</div></div>
+      <div class="card"><div class="v pos sm">+109 758 ₽</div><div class="k">разница [97 505; 121 569] — 95%-й бутстрап</div></div>
+    </div>
+    <p class="note" style="margin-top:clamp(8px,1.6vh,16px)">Ранжирование отвечает на вопрос «что лучше», а решение — «что делать с бюджетом». Топ-20% по скору — это, в основном, глубокая скидка на низкомаржинальные ячейки; порог по знаку ожидаемой маржи отбирает 3,7% кандидатов и выходит в плюс.</p>
+    <ul class="plain" style="margin-top:clamp(10px,2.2vh,22px)">
+      <li>Для сравнения: случайный выбор тех же 1 538 ячеек — <span class="num neg">−812 833 ₽</span>. Модель не случайна, но и не достаточна.</li>
+      <li>Модель: HistGradientBoosting, R² <span class="num">0,9252</span>, MAE <span class="num">89,7 ₽</span>, смещение <span class="num">−25,9 ₽</span>; 29 325 train / 7 691 test ячеек.</li>
+    </ul>
+    <div class="foot">
+      <span class="src">reports/response.json · ranking.qini_coefficient, policies.qini_rank/threshold/random, bootstrap, hypothesis.difference_rub</span>
+      <span class="pg">10 / 12</span>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section class="slide" id="s11" aria-label="Аллокация">
+    <div class="kicker">аллокация <span class="dim">бюджет под ограничением</span></div>
+    <h2>Blanket 15% стоит <span class="accent">−851 508 ₽</span>; та же сумма — в плюс</h2>
+    <table style="margin-top:clamp(4px,1.2vh,14px)">
+      <thead>
+        <tr><th>Политика</th><th style="text-align:right">бюджет</th><th style="text-align:right">прибыль</th><th style="text-align:right">ячеек</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Blanket 15% на все кандидаты</td><td class="n">4 448 117 ₽</td><td class="n neg">−851 508 ₽</td><td class="n">4 756</td></tr>
+        <tr><td>Tight · random 15%</td><td class="n">444 807 ₽</td><td class="n pos">+21 888 ₽</td><td class="n">1 240</td></tr>
+        <tr><td>Tight · top-15% по скору</td><td class="n">444 806 ₽</td><td class="n pos">+136 648 ₽</td><td class="n">966</td></tr>
+        <tr class="best"><td>Tight · optimised</td><td class="n">444 806 ₽</td><td class="n pos">+231 496 ₽</td><td class="n">7 798</td></tr>
+        <tr><td>Loose · optimised</td><td class="n">841 068 ₽ <span class="src">из 2 224 058 ₽</span></td><td class="n pos">+267 850 ₽</td><td class="n">14 484</td></tr>
+      </tbody>
+    </table>
+    <div class="cards c3" style="margin-top:clamp(8px,1.8vh,20px)">
+      <div class="card"><div class="v pos sm">+1 119 358 ₽</div><div class="k">оптимизация против blanket</div></div>
+      <div class="card"><div class="v sm">−3 607 049 ₽</div><div class="k">при этом расход ниже</div></div>
+      <div class="card"><div class="v sm">greedy = brute force</div><div class="k">gap 0,0 ₽; шок отклика ±15% меняет 20,4% / 14,6% выбора</div></div>
+    </div>
+    <p class="note" style="margin-top:auto">Тот же бюджет, потраченный на меньшую глубину в большем числе ячеек, даёт положительную прибыль: оптимизатор опускается до 1–6% там, где потолок низкий.</p>
+    <div class="foot">
+      <span class="src">reports/policy.json · blanket_15, scenarios.tight/loose, vs_blanket, heuristic_check, robustness</span>
+      <span class="pg">11 / 12</span>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section class="slide" id="s12" aria-label="Доказательство и решение">
+    <div class="kicker">доказательство и честность <span class="dim">что показано и что нет</span></div>
+    <h2 style="max-width:40ch">Рендер, а не инстанс — <span class="accent">и решение</span></h2>
+    <div class="evidence" style="margin-top:clamp(4px,1vh,10px)">
+      <div class="shot">
+        <img src="../reports/superset/dashboard-static.png" alt="Статический рендер дашборда Superset: четыре SQL-марта promo-margin-lab" width="3200" height="3408">
+        <span class="cap">Статический рендер тех же SQL-мартов · reports/superset/dashboard-static.png</span>
+      </div>
+      <div>
+        <ul class="plain">
+          <li><b>Ограничить глубину потолком breakeven</b> по каждой категории (1,0–19,5%), не продолжать на среднем 25,43%.</li>
+          <li><b>Финансировать только ячейки с положительной ожидаемой маржой</b> — около 3,7% кандидатов; это +54 361 ₽ против −55 396 ₽ у топ-20%.</li>
+          <li><b>Считать решение в рублях маржи</b>, а не выручки: −24 397 020 ₽ при +68 495 020 ₽ выручки — это ответ, а не сбой.</li>
+        </ul>
+        <p class="note" style="margin-top:clamp(8px,1.5vh,14px)">Живой Superset сейчас показывает пустые слоты чартов — дефект провижининга (не передаётся поле <span style="font-family:var(--mono)">charts</span>, плюс legacy viz без <span style="font-family:var(--mono)">main_dttm_col</span>), REQ-8 в <span style="font-family:var(--mono)">docs/prd-improvement.md</span>. Поэтому отгруженный визуал — именно этот статический рендер тех же SQL-мартов.</p>
+        <div class="divider"></div>
+        <p class="lede" style="font-size:clamp(13px,2.1vh,19px)">Измеренный отрицательный эффект — <span class="teal">тоже ответ</span>. Провал — это провести промо, не измерив его.</p>
+        <p class="src" style="margin-top:6px">«Не промотировать на этой глубине» — решение с ценой, а не отсутствие результата.</p>
+      </div>
+    </div>
+    <div class="foot">
+      <span class="src">reports/superset/dashboard.html · dashboard-static.png (3200×3408) · docs/prd-improvement.md REQ-8 · reports/margin.json, policy.json, response.json</span>
+      <span class="pg">12 / 12</span>
+    </div>
+  </section>
+
+</div>
+
+<div class="hud" aria-hidden="true">
+  <span>← → прокрутка · Home / End</span>
+  <span class="sep"></span>
+  <span class="count" id="count">1 / 12</span>
+</div>
+
+<script>
+(function(){
+  var deck = document.getElementById('deck');
+  var slides = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
+  var counter = document.getElementById('count');
+  var i = 0;
+
+  function clamp(n){ return Math.max(0, Math.min(slides.length - 1, n)); }
+  function label(){ counter.textContent = (i + 1) + ' / ' + slides.length; }
+  function go(n, smooth){
+    i = clamp(n);
+    var left = slides[i].offsetLeft;
+    if (deck.scrollTo) { deck.scrollTo({ left: left, behavior: smooth ? 'smooth' : 'auto' }); }
+    else { deck.scrollLeft = left; }
+    label();
+  }
+
+  deck.addEventListener('scroll', function(){
+    var w = deck.clientWidth || 1;
+    var idx = Math.round(deck.scrollLeft / w);
+    idx = clamp(idx);
+    if (idx !== i) { i = idx; label(); }
+  }, { passive: true });
+
+  document.addEventListener('keydown', function(e){
+    if (e.altKey || e.ctrlKey || e.metaKey) { return; }
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); go(i + 1, true); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(i - 1, true); }
+    else if (e.key === 'Home') { e.preventDefault(); go(0, true); }
+    else if (e.key === 'End') { e.preventDefault(); go(slides.length - 1, true); }
+  });
+
+  var h = parseInt((location.hash || '').replace('#', ''), 10);
+  if (h >= 1 && h <= slides.length) { go(h - 1, false); } else { label(); }
+})();
+</script>
+</body>
+</html>

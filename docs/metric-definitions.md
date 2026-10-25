@@ -17,10 +17,11 @@ rate (this was a real bug, fixed in W3).
 
 The units base is `net_units`, because a returned unit earns no margin. **Known
 gap:** `src/experiment.py:43` computes the primary metric on `units_sold`, so the
-headline incremental CM in `reports/simulation.json` is on a gross base. On the
-current panel the gross base overstates incremental CM by **3.51 mn ₽ (17.2% of
-the −20.39 mn ₽ total)**. Until `store_week_profit` is switched to `net_units`,
-any primary-metric figure quoted from that module carries this bias — PENDING.
+incremental CM it produces is on a gross base. On the current panel the gross
+base overstates incremental CM by **0.41 mn ₽ (15.68% of the −2.61 mn ₽ gross
+experiment-window total)** (`reports/ab_test_readiness.json`,
+`metric_base_error`). Until `store_week_profit` is switched to `net_units`, any
+primary-metric figure quoted from that module carries this bias — PENDING.
 
 **Breakeven depth** = the largest `d` for which
 `(1 + m(d)) × (cm − d × (1 − funding)) > cm`, with `m(d) = A × (1 − e^(−k·d))`
@@ -58,9 +59,11 @@ store × week matrix. It is *not* the ICC of raw profit: store size dominates ra
 CM (between-store SD 27 046 ₽) and the raw ICC is 0.95–0.99, which would imply no
 experiment can ever be powered. The design number applies to the deviation.
 
-Report the window it was computed on. ICC over all 78 weeks and ICC over the
-8-week experiment window are different quantities: on the current panel they are
-**0.2197** and **0.3572**. Power and MDE use the window value.
+Report the base and the window it was computed on. On the current panel: **0.2197**
+on net margin over all 78 weeks (the design number in
+`reports/experiment_design.json`); over the 8-week experiment window, **0.4222**
+on the net base (the value behind the MDE) and **0.3572** on the gross base;
+**0.2791** for any base over the full panel (`reports/ab_test_readiness.json`).
 
 **MDE** = `(z_{1−α/2} + z_power) × √(2/n_arm) × σ_store`, expressed in ₽ per
 store-week, with σ the SD of store means over the experiment window (not the
@@ -89,16 +92,16 @@ budget like any other test — "no peeking" applies only to the primary metric.
 `mean(treatment) / mean(control) − 1`, at the store-week grain. It fires when the
 decline exceeds the threshold for two consecutive weeks. The statistic is a
 one-sided z on the weekly contrast, and the threshold must be stated in SE units:
-a fixed 2% point estimate is not a test. On the current panel the weekly revenue
-SD is 51% of the level, so the SE of the contrast is ~9% and a 2% rule fires
-under the null in **41.8% of 1 000 random splits**. The rule must be recalibrated
-until the simulated false-stop rate is ≤5%.
+a fixed 2% point estimate is not a test. On the current panel it fires under the
+null in **43.0% of 1 000 random splits** (`reports/ab_test_readiness.json`),
+against a 5% target. A two-sided z rule at α = 6.3e-05 per read — Bonferroni over
+16 reads — fires in **0.0%** of the same splits; that is the calibrated form.
 
 **Cannibalization ratio** = `cannibalized units / own incremental units` on a
 wave. The cap policy is supposed to **reduce** it, so the guardrail fires when the
 ratio rises above 35%; the direction matters and must be written down. The
-current `reports/ledger.json` reports 0.19 for a different quantity — it is not
-this guardrail.
+current `reports/ledger.json` gives 0.19 (176 887 / 932 050 units) for a different
+quantity — it is not this guardrail.
 
 **α budget** = 0.001 per guardrail read (Bonferroni over 8 weeks × 2 guardrails),
 separate from the primary α = 0.05. Spending the primary α on weekly guardrail

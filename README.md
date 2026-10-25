@@ -17,7 +17,7 @@ a known ground truth.
 |---|---:|
 | Incremental revenue | **+68.5 m ₽** |
 | Incremental contribution margin | **−24.4 m ₽** |
-| Waves that lose money | **97.9%** of 9,053 |
+| Waves that lose money | **97.88%** of 9,053 |
 | Breakeven depth (by category) | **1.0–19.5%** vs actual 25.4% |
 | Naive vs forecast lift bias | **−19.9%** vs **−3.7%** |
 
@@ -25,6 +25,33 @@ a known ground truth.
 margin is positive — on a tight budget that earns **+231,496 ₽** against
 **+136,648 ₽** for top-15% and **+21,888 ₽** for random, while blanket 15% loses
 **−851,508 ₽**. Full reasoning: [`docs/decision-memo.md`](docs/decision-memo.md).
+
+## The frame: a negative margin lift is still a decision
+
+There is one measurement and two signs, and conflating them is the mistake this
+project exists to prevent. **Volume and revenue lift are positive**: +932,050 own
+units, +740,541 net of pantry, cannibalisation and halo, +68.5 m ₽ of revenue.
+**Contribution-margin lift is negative**: −24.4 m ₽.
+
+That is not a failed measurement. It is what correct measurement returns. The
+discount is paid on units that would have sold at full price, so profit can fall
+while units and revenue rise. The profit bridge is the proof, in one line:
+
+> +25.3 m ₽ margin on incremental units − 44.4 m ₽ discount net of supplier
+> funding = −19.1 m ₽ on promo cells; −5.3 m ₽ spillover; **−24.4 m ₽ total**.
+
+The decision is the deliverable, and it follows directly:
+
+- cap depth at the per-category breakeven (dairy 2.0%, frozen 1.0%, drinks 3.0%,
+  bakery 8.5%, grocery 9.0%, non-food 19.5%);
+- fund only cells with positive expected margin — 285 of 7,691 test cells,
+  about 3.7% of candidates;
+- do not continue at the current 25.43% mean depth.
+
+A measured negative effect, with a false-positive rate of 4.3% and 77.8% power at
+its MDE, is an answer. The only real failure is shipping the promo without
+measuring it: "do not promote at this depth" is a decision with a price tag, not
+an absence of result.
 
 ## Why this exists
 
@@ -77,8 +104,8 @@ promo**; lift is `actual - counterfactual`. Scored against the answer key on the
 
 | estimator | baseline WAPE | lift bias | per-category bias range |
 |---|---:|---:|---|
-| naive 4-week mean | 24.5% | **−19.9%** | −38.6% … −0.9% |
-| log-linear forecast | **7.6%** | **−3.7%** | −5.3% … +2.0% |
+| naive 4-week mean | 24.5% | **−19.9%** | −24.7% … −16.4% |
+| log-linear forecast | **7.6%** | **−3.7%** | −7.2% … −1.4% |
 | matched-control DiD | 20.3% | −14.0% | — |
 
 The naive baseline *understates* lift by a fifth: a 4-week pre-period mean lags
@@ -91,9 +118,9 @@ Two more honest results:
   same SKU and format removes a *common* trend; this confounder is
   store-SKU-specific, so DiD inherits the pre-level bias and adds variance.
 - **A single cell cannot resolve a small effect.** Placebo lift (non-promo cells,
-  no promo within ±2 weeks) has a median of +0.2% for the forecast, but a 90%
-  interval of roughly −16% … +22%. Per-cell lift is a noisy object; detecting a
-  2% effect needs a cluster design, which is W5.
+  no promo within ±2 weeks) has a median of −0.25% for the forecast, but a 90%
+  interval of roughly −16.9% … +21.3%. Per-cell lift is a noisy object; detecting
+  a 2% effect needs a cluster design, which is W5.
 
 ## W3 finding: growth in units, destruction in margin
 
@@ -110,7 +137,7 @@ valued at its own realised price; supplier funding is added back explicitly.
 | **net** | **740,541** | **−1.1%** |
 
 Halo no longer offsets cannibalization and the pantry drag is real: net lift is
-**20.5% below** own lift. On the money side (`reports/margin.json`, 9,053 waves):
+**20.55% below** own lift. On the money side (`reports/margin.json`, 9,053 waves):
 
 | | |
 |---|---:|
@@ -118,15 +145,16 @@ Halo no longer offsets cannibalization and the pantry drag is real: net lift is
 | discount cost | 60.0 m ₽ |
 | supplier funding | +15.6 m ₽ |
 | incremental profit | **−24.4 m ₽** (oracle −24.4 m) |
-| waves with negative profit | **97.9%** |
+| waves with negative profit | **97.88%** |
 | median wave profit | −2,051 ₽ |
 
 The mechanism is the accounting that a "ROI = lift × margin" slide skips: the
 units that would have sold at full price also lose margin when they sell at a
 discount. Volume can grow while profit falls.
 
-**Depth has a ceiling.** Fitted response `m(d) = A·(1 − e^(−k·d))` (R² 0.93–0.97
-on depth bins) gives the depth at which incremental contribution margin hits zero:
+**Depth has a ceiling.** Fitted response `m(d) = A·(1 − e^(−k·d))` (R² 0.94–0.97
+on depth bins, `reports/ledger.json`) gives the depth at which incremental
+contribution margin hits zero:
 
 | category | CM | supplier funding | breakeven depth |
 |---|---:|---:|---:|
@@ -165,17 +193,30 @@ Delivered: `superset/docker-compose.yml`, `superset/superset_config.py`,
 render at `reports/superset/dashboard.html` — labelled *static render*, generated
 from the same SQL, with the live stack named in its footer.
 
-**The live instance is verified.** Docker Hub is unreachable from this machine
-(`TLS handshake timeout` through Docker Desktop's proxy), so Superset runs from a
-Python 3.11 venv instead: `superset/bootstrap_local.sh` installs the pinned
-requirements, upgrades the metadata DB, creates the admin and serves on `:8088`.
-`superset/provision.py` registers the mart database, four datasets, four charts
-and a dashboard, then exports them to `superset/export/superset-assets.zip`.
+**The live instance runs; the live dashboard does not render its charts.**
+Docker Hub is unreachable from this machine (`TLS handshake timeout` through
+Docker Desktop's proxy), so Superset runs from a Python 3.11 venv instead:
+`superset/bootstrap_local.sh` installs the pinned requirements, upgrades the
+metadata DB, creates the admin and serves on `:8088`. `superset/provision.py`
+registers the mart database, four datasets, four charts and a dashboard, then
+exports them to `superset/export/superset-assets.zip`.
 
-Proof it is not just config: SQL Lab on the live instance returns
+Proof the connection is real: SQL Lab on the live instance returns
 `COUNT(*)=9053`, `SUM(net_profit)=−24 397 020.0`, `SUM(revenue_delta)=68 495 020.1`
-— the same numbers as `reports/margin.json`. The Docker compose stack stays in
-the repo as the alternative path.
+— the same numbers as `reports/margin.json`.
+
+What does *not* work, measured on 2026-10-25: the dashboard's chart slots render
+“There is no chart definition associated with this component”. Two causes, both
+in the provisioning script. `ensure_dashboard` (`superset/provision.py:197-206`)
+writes `position_json` but never sends the `charts` field, so the
+`dashboard_slices` association is never created; and the four saved charts use
+legacy time-series viz types whose `promo_waves.week` is an integer without a
+`main_dttm_col`, so Explore refuses to build their query. The shipped visual is
+therefore the **static render** — `reports/superset/dashboard.html` and its
+committed screenshot `reports/superset/dashboard-static.png` — which is labelled
+as a static render in its own footer. Fixing the live board is tracked as REQ-8
+in [`docs/prd-improvement.md`](docs/prd-improvement.md). The Docker compose stack
+stays in the repo as the alternative path.
 
 ## W5: a design that survives its own simulation
 
@@ -185,19 +226,23 @@ contribution margin per store-week. Pre-registration and threats:
 
 | | |
 |---|---:|
-| ICC (between-store share of variance) | 0.138 |
-| MDE at α=0.05, power 0.80 | **612 ₽ / store-week** (0.29% of weekly revenue) |
-| False-positive rate, 1 000 null splits | **4.7%** |
+| ICC (net margin, 78-week panel) | 0.2197 |
+| ICC (gross base, 8-week window — the one power and MDE use) | 0.3572 |
+| MDE at α=0.05, power 0.80 | **786 ₽ / store-week** (0.367% of weekly revenue) |
+| False-positive rate, 1 000 null splits | **4.3%** |
 | Power at the MDE | **77.8%** |
-| CI coverage of the injected effect | **95.0%** |
+| CI coverage of the injected effect | **95.3%** |
 
-The design check that mattered: a **common switch week** (classic switchback)
-rejects **100% of the time under the null** — week effects absorb the treatment,
-and the promo calendar leaks in as an effect. Randomising the phase per store and
-demeaning store and week fixes it: 4.0% false positives, 87.8% power at the MDE
-(Monte-Carlo SE ≈ 1.5 pp at 500 replications),
-and an injected carryover of 0.5 recovered as **0.49**. Which is why the cluster
-RCT is primary and the switchback is the fallback for a finer MDE.
+ICC depends on the base and the window, and both must be named: the design uses
+**0.2197 on net margin over the 78-week panel**; the 8-week readiness audit
+reports 0.4222 on the net base and 0.3572 on the gross base (`reports/ab_test_readiness.json`).
+
+The switchback is the fallback, not a substitute. Run on the **76-week** panel it
+holds its nominal error rate (5.2% null rejection at 500 replications), reaches
+98.6% rejection at an injected 786 ₽, and recovers an injected carryover of 0.5 as
+**0.495**. That 98.6% is not comparable to the RCT's 77.8% — different window,
+different estimator. Before the switchback can be called more powerful it has to
+be re-run on the same 8-week window; that run is open (`docs/experiment-design.md`).
 
 ## W6: a great ranking, a losing decision
 
@@ -227,7 +272,7 @@ The ranking is nearly perfect and the policy it implies still loses 55 thousand
 roubles: Qini measures order, not level. The calibrated threshold earns +54 k by
 spending on **3.7%** of the cells — and even the oracle loses money if it is
 forced to fill the budget. The hypothesis stated in the PRD holds: threshold
-minus rank = **+109 757 ₽**, bootstrap CI [97 505; 121 569].
+minus rank = **+109 758 ₽**, bootstrap CI [97 505; 121 569].
 
 One caveat, stated because it is easy to hide: a Qini of 0.96 is high partly
 because the data-generating process is smooth and the features include depth and
@@ -240,27 +285,27 @@ Allocation instance: one planning week, 4 756 candidates after the spacing rule
 (no promo on the SKU in the previous 6 weeks), depth grid 1–40%, depth capped at
 the category breakeven, budget = a share of what blanket 15% would cost.
 
-| tight budget (450.7 k ₽, 10% of blanket) | profit ₽ | spend ₽ |
+| tight budget (444.8 k ₽, 10% of blanket) | profit ₽ | spend ₽ |
 |---|---:|---:|
-| random 15% | 21 888 | 450 652 |
-| top profit-per-rouble at 15% | 136 648 | 450 646 |
-| **optimised (depth + selection)** | **231 496** | 450 620 |
+| random 15% | 21 888 | 444 807 |
+| top profit-per-rouble at 15% | 136 648 | 444 806 |
+| **optimised (depth + selection)** | **231 496** | 444 806 |
 
-| loose budget (2.25 m ₽, 50%) | profit ₽ | spend ₽ |
+| loose budget (2.22 m ₽, 50%) | profit ₽ | spend ₽ |
 |---|---:|---:|
-| random 15% | 96 537 | 2 038 474 |
-| top profit-per-rouble at 15% | 191 502 | 1 271 923 |
+| random 15% | 96 537 | 1 763 271 |
+| top profit-per-rouble at 15% | 191 502 | 1 073 507 |
 | **optimised** | **267 850** | **841 068** |
 
-Blanket 15% across all candidates loses **−851 508 ₽** on 4.51 m of spend
+Blanket 15% across all candidates loses **−851 508 ₽** on 4.45 m of spend
 (−0.19 ₽ per rouble). The optimised policy earns **+0.32 ₽ per rouble**, i.e.
 +1 119 358 ₽ versus blanket while spending 3.6 m less.
 
 Two results worth saying out loud:
 
-- **The loose budget is not binding.** At 2.25 m the optimiser stops at 841 k and
-  leaves 1.41 m unspent: after the breakeven cap, there are only ~3.8 k cells
-  with positive expected margin. Spending the rest would buy losses.
+- **The loose budget is not binding.** At 2.22 m the optimiser stops at 841 k and
+  leaves 1.38 m unspent: after the breakeven cap, every remaining candidate has
+  negative expected margin. Spending the rest would buy losses.
 - **Depth choice is where the money is.** The optimised plan spreads depth from
   1% to 18% instead of a flat 15%: the cap is 1–20% depending on the category, and
   15% is above it for five of six.
@@ -268,8 +313,8 @@ Two results worth saying out loud:
 Constraints checked: budget never exceeded; spacing honoured (test asserts no
 candidate had a promo in the previous 6 weeks); depths inside the cap; greedy
 matches brute force on a 5-cell instance (gap 0%). Under a ±15% shock to the
-response multiplier, the selection changes by 12% / 9% and profit moves to
-150 k / 302 k — the decision is sensitive to the curve, which is why W5 exists.
+response multiplier, the selection changes by 20.4% / 14.6% and profit moves to
+168 k / 383 k — the decision is sensitive to the curve, which is why W5 exists.
 
 **Not modelled:** supplier funding tiers. The dataset has a flat per-SKU funding
 rate, so a tiered contract would be an invented assumption, not a result. Stated
@@ -352,15 +397,24 @@ reports/spark_parity.json, reports/superset/dashboard.html
   tight budget, and must match brute force on a small instance — the W7 claim is
   executable;
 - Spark and pandas must agree to 0.0 on the real panel, and the plan must contain
-  the broadcast join and the window — the W8 claim is executable, and the test
-  skips only when no JDK is available.
+  the broadcast join and the window — the W8 claim is executable. **Known gap:**
+  the test does not reliably skip without a JDK. `pytest.importorskip` covers only
+  a missing `pyspark`; `ensure_java()` is only caught inside the fixture, and
+  `test_session_can_restart` has no skip path, so a JDK-less run errors rather
+  than skips. Locally, with a homebrew JDK found and `pyspark` installed, four
+  fixture tests also errored on a PySpark worker/driver Python mismatch (3.15 vs
+  3.14). Treat Spark tests as green only under `uv sync --group spark` with a
+  matched JDK and interpreter.
 
 ## Status and gates
 
-W0–W8 are complete. W9 (an external dataset check) is not started — nothing in
-the repository validates the pipeline on data other than its own generator. The live Superset instance was verified through the
-Docker-free path (`superset/bootstrap_local.sh`); the compose stack stays as the
-alternative for machines that can reach Docker Hub.
+**W0–W9 are complete.** W9 — the narrative pack: RU/EN case pages, hero, demo,
+diagram, claims and registry entries — is built and checked outside this repo
+(`reports/prd/promo-margin-lab.md` in the portfolio root). One check is still
+open, and it is not a W9 deliverable: nothing in the repository validates the
+pipeline on data other than its own generator. The live Superset instance was
+verified through the Docker-free path (`superset/bootstrap_local.sh`); the
+compose stack stays as the alternative for machines that can reach Docker Hub.
 
-The full plan, including acceptance criteria and the honest refusals, is the PRD:
-[`reports/prd/promo-margin-lab.md`](https://github.com/NikitaBoyarkin/obsidian/blob/main/reports/prd/promo-margin-lab.md).
+The improvement backlog, including acceptance criteria and the honest refusals,
+lives at [`docs/prd-improvement.md`](docs/prd-improvement.md).
