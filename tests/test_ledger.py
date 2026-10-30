@@ -13,6 +13,12 @@ from ledger import _truth_component, breakeven_table, build_waves, fit_response,
 
 REPORT = Path(__file__).resolve().parents[1] / "reports" / "ledger.json"
 
+# The artefact is generated on macOS/arm64, CI runs linux/x86_64: uv.lock resolves the same
+# pandas/numpy/scikit-learn versions, but BLAS sums in a different order. Observed drift on this
+# report is 28 RUB out of 24.4M (1.2e-6 relative). A real drift (bug, changed parameter) moves the
+# headline by at least 0.1%, so this band still turns red on anything that matters.
+REPORT_REL = 1e-4
+
 
 @pytest.fixture(scope="module")
 def result(cfg, panel, sim, counterfactual):
@@ -69,10 +75,15 @@ def test_committed_ledger_report_matches_fresh_run(result) -> None:
     """Bind the headline number to the code: a silent drift turns this red."""
     report = json.loads(REPORT.read_text())
     assert report["summary"]["net_profit_rub"] == pytest.approx(
-        result["summary"]["net_profit_rub"], rel=1e-6
+        result["summary"]["net_profit_rub"], rel=REPORT_REL
     )
     assert report["summary"]["pnl_bridge"] == pytest.approx(
-        result["summary"]["pnl_bridge"], rel=1e-6
+        result["summary"]["pnl_bridge"], rel=REPORT_REL
+    )
+    # the artefact is internally consistent regardless of the machine that produced it
+    assert (
+        abs(report["summary"]["pnl_bridge"]["net_profit_rub"] - report["summary"]["net_profit_rub"])
+        < 50.0
     )
 
 
